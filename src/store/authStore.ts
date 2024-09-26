@@ -27,10 +27,12 @@ export const useAuthStore = create<loginAuth>((set) => ({
         `${process.env.NEXT_PUBLIC_API_URL}/users/id/${res.data.data.user.id}`
       );
       const user = getUser.data.data;
+      set({ user: user });
       return user;
     } catch (error) {
       setTimeout(() => {
         toast.error("Invalid Email & Password");
+        console.log(error);
       }, 100);
     }
   },

@@ -6,7 +6,6 @@ import {
   DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -25,10 +24,6 @@ import {
 import { useUserStore } from "@/store/userStore";
 import { useEffect, useState } from "react";
 import { User } from "@/utils/objectTypes";
-import { format } from "date-fns";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
-import UserUpdateForm from "@/sub-components/UserUpdateForm";
 import UserProfile from "@/sub-components/UserProfile";
 
 Chart.register(BarController, BarElement, CategoryScale, LinearScale);
@@ -58,14 +53,14 @@ const UserPanel = ({ id }: { id: string }) => {
 
   useEffect(() => {
     startUp();
-  }, [getUser]);
+  }, []);
 
   return (
     <div className="p-6 bg-[#f1f5f9] text-black">
       {/* Logout Button */}
       <div className="flex justify-between mb-6">
         <h1 className="text-2xl font-bold max-md:text-xl max-sm:text-lg">
-          Employee Dashboard {user?.name}
+          Employee Dashboard
         </h1>
         <div>
           <Dialog>
@@ -145,12 +140,12 @@ const UserPanel = ({ id }: { id: string }) => {
           <Skeleton />
         </div>
 
-        <div className="w-full">
-          {/* Profile Section */}
+        {/* Profile Section */}
 
+        <div className="w-full">
           {user ? (
             <div>
-              <UserProfile user={user} />
+              <UserProfile user={user} setUser={setUser} />
             </div>
           ) : (
             <Skeleton className="p-2 flex flex-col gap-3 justify-center px-3">

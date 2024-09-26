@@ -9,9 +9,15 @@ import { registerSchema } from "@/utils/formSchemas";
 import { registerData } from "@/utils/objectTypes";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import { Toaster } from "sonner";
+import { toast, Toaster } from "sonner";
+import { useUserStore } from "@/store/userStore";
+import { useRouter } from "next/navigation";
 
-const Register = () => {
+const Register = ({ admin }: { admin: boolean }) => {
+  const { createUser } = useUserStore();
+
+  const router = useRouter();
+
   const form = useForm({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -21,14 +27,41 @@ const Register = () => {
       password: "",
     },
   });
-  const formSubmit: SubmitHandler<registerData> = (data) => {
-    console.log(data);
-    form.reset();
+  const formSubmit: SubmitHandler<registerData> = async (data) => {
+    const newData = { ...data, phone: "+91-" + data.phone };
+    try {
+      const user = await createUser(newData);
+      form.reset();
+      if (admin) {
+        setTimeout(() => {
+          toast.success("Employee Added");
+        }, 100);
+        return router.push("/admin");
+      }
+      const userRole: string = user.roles[0].key;
+      if (userRole === "Employee") {
+        setTimeout(() => {
+          toast.success(`Welcome ${user.name}`);
+        }, 100);
+        return router.push(`/employee/${user.id}`);
+      } else if (userRole === "Admin") {
+        setTimeout(() => {
+          toast.success(`Welcome ${user.name}`);
+        }, 100);
+        return router.push(`/admin`);
+      }
+    } catch (error) {
+      form.reset();
+      console.log(error);
+      return null;
+    }
   };
   return (
-    <main className="w-full h-screen flex justify-center items-center  bg-cover bg-[#f1f5f9]">
+    <main className="w-full h-full flex justify-center items-center  bg-cover bg-[#f1f5f9]">
       <div className="w-96 mx-auto p-4 shadow  max-sm:w-72 rounded-lg bg-white/60 relative text-black">
-        <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">
+          {admin ? "Add Employee" : "Register"}
+        </h2>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(formSubmit)}>
@@ -98,19 +131,21 @@ const Register = () => {
                 type="submit"
                 className="w-full bg-[#6343d8] hover:bg-[#593cc1]"
               >
-                Register
+                {admin ? "Add Employee" : "Register"}
               </Button>
             </div>
 
-            <div>
-              <p className="pt-3 text-[#637085]">
-                Already you have an account? &nbsp;
-                <Link href="/login" className="text-red-500">
-                  {" "}
-                  Login
-                </Link>
-              </p>
-            </div>
+            {!admin && (
+              <div>
+                <p className="pt-3 text-[#637085]">
+                  Already you have an account? &nbsp;
+                  <Link href="/login" className="text-red-500">
+                    {" "}
+                    Login
+                  </Link>
+                </p>
+              </div>
+            )}
           </form>
         </Form>
       </div>

@@ -3,7 +3,13 @@ import UserUpdateForm from "./UserUpdateForm";
 import { User } from "@/utils/objectTypes";
 import { format } from "date-fns";
 
-const UserProfile = ({ user }: { user: User }) => {
+const UserProfile = ({
+  user,
+  setUser,
+}: {
+  user: User;
+  setUser: (data: User) => void;
+}) => {
   return (
     <div className="bg-white shadow-md rounded-lg p-6">
       <h3 className="text-xl font-bold mb-4">Profile</h3>
@@ -46,7 +52,7 @@ const UserProfile = ({ user }: { user: User }) => {
           {user.dob ? format(user.dob, "dd-MM-yyy") : "Not Updated"}
         </h1>
       </div>
-      <UserUpdateForm user={user} />
+      <UserUpdateForm user={user} setUser={setUser} admin={false} />
     </div>
   );
 };

@@ -14,17 +14,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useUserStore } from "@/store/userStore";
 import { User } from "@/utils/objectTypes";
-import { useRouter } from "next/navigation";
+import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useEffect, useState } from "react";
 
-const UserUpdateForm = ({ user }: { user: User }) => {
+const UserUpdateForm = ({
+  user,
+  setUser,
+  admin,
+}: {
+  user: User;
+  setUser?: (data: User) => void;
+  admin?: boolean;
+}) => {
   const { updateUser, getUser } = useUserStore();
 
   const [name, setName] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [dob, setDob] = useState<string>("");
-
-  const router = useRouter();
 
   const handleSubmit = async () => {
     const newUserData = {
@@ -32,7 +38,9 @@ const UserUpdateForm = ({ user }: { user: User }) => {
       phone,
       dob,
     };
-    updateUser(user.id, newUserData);
+    await updateUser(user.id, newUserData);
+    const updatedUser = await getUser(user.id);
+    setUser?.(updatedUser);
   };
 
   const setValues = () => {
@@ -48,9 +56,13 @@ const UserUpdateForm = ({ user }: { user: User }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="w-full bg-[#6343d8] hover:bg-[#593cc1]">
-          Update Profile
-        </Button>
+        {admin ? (
+          <Icon icon="mage:edit" fontSize={30} className=" cursor-pointer" />
+        ) : (
+          <Button className="w-full bg-[#6343d8] hover:bg-[#593cc1]">
+            Update Profile
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="bg-white text-black max-sm:w-11/12">
         <DialogHeader>

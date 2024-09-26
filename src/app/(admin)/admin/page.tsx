@@ -1,7 +1,12 @@
+import AdminEmployeeList from "@/components/AdminEmployeeList";
 import React from "react";
 
 const AdminPage = () => {
-  return <div>AdminPage</div>;
+  return (
+    <div>
+      <AdminEmployeeList />
+    </div>
+  );
 };
 
 export default AdminPage;

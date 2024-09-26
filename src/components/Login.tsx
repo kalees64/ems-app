@@ -31,12 +31,12 @@ const Login = () => {
       const user = await login(data);
       const userRole: string = user.roles[0].key;
       form.reset();
-      if (userRole === "Employee") {
+      if (userRole === "Admin") {
         setTimeout(() => {
           toast.success(`Welcome ${user.name}`);
         }, 100);
         return router.push(`/employee/${user.id}`);
-      } else if (userRole === "Admin") {
+      } else if (userRole === "Employee") {
         setTimeout(() => {
           toast.success(`Welcome ${user.name}`);
         }, 100);
@@ -44,6 +44,7 @@ const Login = () => {
       }
     } catch (error) {
       form.reset();
+      console.log(error);
       return null;
     }
   };
