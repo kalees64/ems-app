@@ -12,9 +12,15 @@ import {
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import Sidebar from "./Sidebar";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
 
 const Navbar = () => {
   const [side, setSide] = useState<boolean>(false);
+
+  const router = useRouter();
+
+  const { logout } = useAuthStore();
   return (
     <div className="flex items-center justify-between bg-white p-4 shadow-md text-black relative">
       {/* <div>Admin Dashboard</div> */}
@@ -46,7 +52,15 @@ const Navbar = () => {
               <DialogDescription>Click yes to logout</DialogDescription>
             </DialogHeader>
             <div className="flex gap-5">
-              <Button className="bg-[#754ffe] hover:bg-[#6f42c1]">Yes</Button>
+              <Button
+                className="bg-[#754ffe] hover:bg-[#6f42c1]"
+                onClick={() => {
+                  logout();
+                  router.push("/login");
+                }}
+              >
+                Yes
+              </Button>
               <DialogClose asChild>
                 <Button className="bg-red-700">Cancel</Button>
               </DialogClose>

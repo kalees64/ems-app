@@ -7,6 +7,7 @@ import { toast } from "sonner";
 interface loginAuth {
   user: object;
   login: (data: loginData) => Promise<User>;
+  logout: () => void;
 }
 
 export const useAuthStore = create<loginAuth>((set) => ({
@@ -29,6 +30,24 @@ export const useAuthStore = create<loginAuth>((set) => ({
       const user = getUser.data.data;
       set({ user: user });
       return user;
+    } catch (error) {
+      setTimeout(() => {
+        toast.error("Invalid Email & Password");
+        console.log(error);
+      }, 100);
+    }
+  },
+  logout: async () => {
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
+        { withCredentials: true }
+      );
+      localStorage.removeItem("token");
+      console.log(res);
+      setTimeout(() => {
+        toast.success("Logout successfull");
+      }, 100);
     } catch (error) {
       setTimeout(() => {
         toast.error("Invalid Email & Password");

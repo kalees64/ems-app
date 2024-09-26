@@ -25,6 +25,8 @@ import { useUserStore } from "@/store/userStore";
 import { useEffect, useState } from "react";
 import { User } from "@/utils/objectTypes";
 import UserProfile from "@/sub-components/UserProfile";
+import { useAuthStore } from "@/store/authStore";
+import { useRouter } from "next/navigation";
 
 Chart.register(BarController, BarElement, CategoryScale, LinearScale);
 
@@ -43,8 +45,11 @@ const UserPanel = ({ id }: { id: string }) => {
   };
 
   const { getUser } = useUserStore();
+  const { logout } = useAuthStore();
 
   const [user, setUser] = useState<User>();
+
+  const router = useRouter();
 
   const startUp = async () => {
     const res = await getUser(id);
@@ -77,7 +82,14 @@ const UserPanel = ({ id }: { id: string }) => {
                 <DialogDescription>Click yes to logout</DialogDescription>
               </DialogHeader>
               <div className="flex gap-5">
-                <Button>Yes</Button>
+                <Button
+                  onClick={() => {
+                    logout();
+                    router.push("/login");
+                  }}
+                >
+                  Yes
+                </Button>
                 <DialogClose asChild>
                   <Button className="bg-red-700">Cancel</Button>
                 </DialogClose>
