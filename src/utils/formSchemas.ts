@@ -32,3 +32,50 @@ export const registerSchema = z.object({
       "Password must include at least 1 uppercase, 1 lowercase, 1 number, and 1 special character"
     ),
 });
+
+// Leave add form schema
+export const leaveAddSchema = z
+  .object({
+    name: z.string().min(3, "Leave name should be  greater than 3 letters"),
+    count: z
+      .string()
+      .length(2, { message: "Must be exactly 12 characters long." }) // Ensure the string is exactly 12 characters long
+      .regex(/^[0-9]+$/, { message: "Must contain only numeric characters." }),
+    // key: z.string().min(3, "Key name should be  greater than 3 letters"),
+  })
+  .required();
+
+// Leave apply form schema
+export const leaveApplySchema = z.object({
+  startDate: z
+    .string()
+    .min(1, { message: "From date is required." })
+    .refine((date) => !isNaN(new Date(date).getTime()), {
+      message: "From date must be a valid date.",
+    }),
+  endDate: z
+    .string()
+    .min(1, { message: "To date is required." })
+    .refine((date) => !isNaN(new Date(date).getTime()), {
+      message: "To date must be a valid date.",
+    })
+    .refine(
+      (endDate) => {
+        const startDate = z
+          .object({
+            startDate: z.string(),
+            endDate: z.string(),
+          })
+          .parse({ startDate: "2023-01-01", endDate });
+        if (startDate && new Date(endDate) < new Date(startDate.startDate)) {
+          return false;
+        }
+        return true;
+      },
+      {
+        message: "To date must be on or after the From date.",
+      }
+    ),
+  leaveType: z.string().min(1, { message: "Leave type is required." }),
+  reason: z.string().min(1, { message: "Reason is required." }),
+});

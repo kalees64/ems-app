@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "./ui/button";
+
 import {
   Dialog,
   DialogClose,
@@ -10,10 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import { Icon } from "@iconify/react/dist/iconify.js";
-import { Bar } from "react-chartjs-2";
-import { Skeleton } from "./ui/skeleton";
-import { Toaster } from "sonner";
+
 import {
   BarController,
   BarElement,
@@ -21,12 +19,28 @@ import {
   LinearScale,
   Chart,
 } from "chart.js";
+
+import { Icon } from "@iconify/react/dist/iconify.js";
+
+import { Bar } from "react-chartjs-2";
+
+import { Skeleton } from "./ui/skeleton";
+
+import { Toaster } from "sonner";
+
 import { useUserStore } from "@/store/userStore";
+
 import { useEffect, useState } from "react";
+
 import { User } from "@/utils/objectTypes";
+
 import UserProfile from "@/sub-components/UserProfile";
+
 import { useAuthStore } from "@/store/authStore";
+
 import { useRouter } from "next/navigation";
+
+import LeaveRequestForm from "@/sub-components/LeaveRequestForm";
 
 Chart.register(BarController, BarElement, CategoryScale, LinearScale);
 
@@ -45,6 +59,7 @@ const UserPanel = ({ id }: { id: string }) => {
   };
 
   const { getUser } = useUserStore();
+
   const { logout } = useAuthStore();
 
   const [user, setUser] = useState<User>();
@@ -67,6 +82,7 @@ const UserPanel = ({ id }: { id: string }) => {
         <h1 className="text-2xl font-bold max-md:text-xl max-sm:text-lg">
           Employee Dashboard
         </h1>
+
         <div>
           <Dialog>
             <DialogTrigger asChild>
@@ -76,11 +92,13 @@ const UserPanel = ({ id }: { id: string }) => {
                 className="cursor-pointer"
               />
             </DialogTrigger>
+
             <DialogContent className="bg-white text-black max-sm:w-11/12">
               <DialogHeader>
                 <DialogTitle>Do you want logout?</DialogTitle>
                 <DialogDescription>Click yes to logout</DialogDescription>
               </DialogHeader>
+
               <div className="flex gap-5">
                 <Button
                   onClick={() => {
@@ -90,6 +108,7 @@ const UserPanel = ({ id }: { id: string }) => {
                 >
                   Yes
                 </Button>
+
                 <DialogClose asChild>
                   <Button className="bg-red-700">Cancel</Button>
                 </DialogClose>
@@ -106,6 +125,7 @@ const UserPanel = ({ id }: { id: string }) => {
           <p className="text-2xl font-bold">32</p>
           <p className="text-sm text-[#637085]">Days</p>
         </div>
+
         <div className="p-4 bg-white shadow-md rounded-lg text-center">
           <h3 className="text-lg font-semibold text-[#637085]">
             Pending Leaves
@@ -113,6 +133,7 @@ const UserPanel = ({ id }: { id: string }) => {
           <p className="text-2xl font-bold">32</p>
           <p className="text-sm text-[#637085]">Days</p>
         </div>
+
         <div className="p-4 bg-white shadow-md rounded-lg text-center">
           <h3 className="text-lg font-semibold text-[#637085]">
             Casual Leaves
@@ -120,11 +141,13 @@ const UserPanel = ({ id }: { id: string }) => {
           <p className="text-2xl font-bold">0</p>
           <p className="text-sm text-[#637085]">Days</p>
         </div>
+
         <div className="p-4 bg-white shadow-md rounded-lg text-center">
           <h3 className="text-lg font-semibold text-[#637085]">Sick Leaves</h3>
           <p className="text-2xl font-bold">0</p>
           <p className="text-sm text-[#637085]">Days</p>
         </div>
+
         <div className="p-4 bg-white shadow-md rounded-lg text-center">
           <h3 className="text-lg font-semibold text-[#637085]">Paid Leaves</h3>
           <p className="text-2xl font-bold">0</p>
@@ -139,6 +162,7 @@ const UserPanel = ({ id }: { id: string }) => {
           <h3 className="text-xl font-bold mb-4">Leave Overview</h3>
           <Bar data={chartData} />
         </div>
+
         <div className="bg-white shadow-md rounded-lg p-6">
           <h3 className="text-xl font-bold mb-4">Holiday Calender</h3>
           <Skeleton />
@@ -149,7 +173,7 @@ const UserPanel = ({ id }: { id: string }) => {
       <div className="grid grid-cols-2 gap-8 mb-8 max-lg:grid-cols-1">
         <div className="bg-white shadow-md rounded-lg p-6 ">
           <h3 className="text-xl font-bold mb-4">Request Leave</h3>
-          <Skeleton />
+          <LeaveRequestForm id={id} />
         </div>
 
         {/* Profile Section */}

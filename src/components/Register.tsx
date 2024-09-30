@@ -1,16 +1,29 @@
 "use client";
+
 import React from "react";
+
 import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
+
 import { Label } from "./ui/label";
+
 import { Input } from "./ui/input";
+
 import { SubmitHandler, useForm } from "react-hook-form";
+
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import { registerSchema } from "@/utils/formSchemas";
-import { registerData } from "@/utils/objectTypes";
+
+import { T_registerData } from "@/utils/objectTypes";
+
 import { Button } from "./ui/button";
+
 import Link from "next/link";
+
 import { toast, Toaster } from "sonner";
+
 import { useUserStore } from "@/store/userStore";
+
 import { useRouter } from "next/navigation";
 
 const Register = ({ admin }: { admin: boolean }) => {
@@ -27,15 +40,18 @@ const Register = ({ admin }: { admin: boolean }) => {
       password: "",
     },
   });
-  const formSubmit: SubmitHandler<registerData> = async (data) => {
+
+  const formSubmit: SubmitHandler<T_registerData> = async (data) => {
     const newData = { ...data, phone: "+91-" + data.phone };
     try {
       const user = await createUser(newData);
       form.reset();
       if (admin) {
-        setTimeout(() => {
-          toast.success("Employee Added");
-        }, 100);
+        if (user) {
+          setTimeout(() => {
+            toast.success("Employee Added");
+          }, 100);
+        }
         return router.push("/admin");
       }
       const userRole: string = user.roles[0].key;
@@ -56,6 +72,7 @@ const Register = ({ admin }: { admin: boolean }) => {
       return null;
     }
   };
+
   return (
     <main className="w-full h-full flex justify-center items-center  bg-cover bg-[#f1f5f9]">
       <div className="w-96 mx-auto p-4 shadow  max-sm:w-72 rounded-lg bg-white/60 relative text-black">
@@ -70,7 +87,9 @@ const Register = ({ admin }: { admin: boolean }) => {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <Label className="text-[#637085]">Name</Label>
+                  <Label className="text-[#637085]">
+                    Name<span className="text-red-500">&nbsp;*</span>
+                  </Label>
                   <FormControl>
                     <Input type="text" {...field} placeholder="Robert" />
                   </FormControl>
@@ -78,12 +97,15 @@ const Register = ({ admin }: { admin: boolean }) => {
                 </FormItem>
               )}
             />
+
             <FormField
               name="email"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <Label className="text-[#637085]">Email</Label>
+                  <Label className="text-[#637085]">
+                    Email<span className="text-red-500">&nbsp;*</span>
+                  </Label>
                   <FormControl>
                     <Input
                       type="text"
@@ -95,12 +117,15 @@ const Register = ({ admin }: { admin: boolean }) => {
                 </FormItem>
               )}
             />
+
             <FormField
               name="phone"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <Label className="text-[#637085]">Phone</Label>
+                  <Label className="text-[#637085]">
+                    Phone<span className="text-red-500">&nbsp;*</span>
+                  </Label>
                   <FormControl>
                     <Input
                       type="text"
@@ -113,12 +138,15 @@ const Register = ({ admin }: { admin: boolean }) => {
                 </FormItem>
               )}
             />
+
             <FormField
               name="password"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <Label className="text-[#637085]">Password</Label>
+                  <Label className="text-[#637085]">
+                    Password<span className="text-red-500">&nbsp;*</span>
+                  </Label>
                   <FormControl>
                     <Input type="password" {...field} placeholder="••••••••" />
                   </FormControl>
@@ -126,6 +154,7 @@ const Register = ({ admin }: { admin: boolean }) => {
                 </FormItem>
               )}
             />
+
             <div className="pt-3 w-full">
               <Button
                 type="submit"

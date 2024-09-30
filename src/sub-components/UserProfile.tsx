@@ -1,6 +1,9 @@
 import React from "react";
+
 import UserUpdateForm from "./UserUpdateForm";
+
 import { User } from "@/utils/objectTypes";
+
 import { format } from "date-fns";
 
 const UserProfile = ({
@@ -23,6 +26,7 @@ const UserProfile = ({
         </label>
         <h1 className="w-full font-bold">{user.name}</h1>
       </div>
+
       <div className="mb-4">
         <label
           htmlFor="email"
@@ -32,6 +36,7 @@ const UserProfile = ({
         </label>
         <h1 className="w-full font-bold">{user.email}</h1>
       </div>
+
       <div className="mb-4">
         <label
           htmlFor="phone"
@@ -41,6 +46,7 @@ const UserProfile = ({
         </label>
         <h1 className="w-full font-bold">{user.phone}</h1>
       </div>
+
       <div className="mb-4">
         <label
           htmlFor="phone"
@@ -52,6 +58,7 @@ const UserProfile = ({
           {user.dob ? format(user.dob, "dd-MM-yyy") : "Not Updated"}
         </h1>
       </div>
+
       <UserUpdateForm user={user} setUser={setUser} admin={false} />
     </div>
   );

@@ -1,7 +1,11 @@
 "use client";
+
 import { Icon } from "@iconify/react/dist/iconify.js";
+
 import React, { useEffect } from "react";
+
 import { Card, CardContent } from "./ui/card";
+
 import {
   Table,
   TableBody,
@@ -10,8 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
-import Link from "next/link";
-import { useUserStore } from "@/store/userStore";
+
 import {
   Dialog,
   DialogClose,
@@ -21,8 +24,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
+
+import Link from "next/link";
+
+import { useUserStore } from "@/store/userStore";
+
 import { Button } from "./ui/button";
+
 import UserUpdateForm from "@/sub-components/UserUpdateForm";
+
 import { User } from "@/utils/objectTypes";
 
 const AdminEmployeeList = () => {
@@ -35,6 +45,7 @@ const AdminEmployeeList = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
+
   return (
     <section className="w-full ">
       <div className="w-full flex justify-between items-center mb-4">
@@ -48,6 +59,7 @@ const AdminEmployeeList = () => {
           <p>Add Employee</p>
         </Link>
       </div>
+
       <div className="w-80">
         <Card className="">
           <CardContent className="flex pt-4">
@@ -57,6 +69,7 @@ const AdminEmployeeList = () => {
                 {users ? users.length : 0}
               </h1>
             </div>
+
             <div className="w-5/12 flex justify-end items-center">
               <Icon
                 icon="flowbite:users-outline"
@@ -68,6 +81,7 @@ const AdminEmployeeList = () => {
           </CardContent>
         </Card>
       </div>
+
       <Card className="w-full mt-5 pt-2 max-sm:px-1  relative px-4 shadow ">
         <h2 className="text-lg font-semibold ps-2 pb-2 pt-2">
           Employees List ({users ? users.length : 0}){" "}
@@ -91,6 +105,7 @@ const AdminEmployeeList = () => {
               </TableHead>
             </TableRow>
           </TableHeader>
+
           <TableBody className="text-[#637085]">
             {users?.length ? (
               users.map((user: User, index: number) => {

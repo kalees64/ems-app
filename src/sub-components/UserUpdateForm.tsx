@@ -1,5 +1,7 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
+
 import {
   Dialog,
   DialogClose,
@@ -10,11 +12,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+
 import { Input } from "@/components/ui/input";
+
 import { Label } from "@/components/ui/label";
+
 import { useUserStore } from "@/store/userStore";
+
 import { User } from "@/utils/objectTypes";
+
 import { Icon } from "@iconify/react/dist/iconify.js";
+
 import React, { useEffect, useState } from "react";
 
 const UserUpdateForm = ({
@@ -29,7 +37,9 @@ const UserUpdateForm = ({
   const { updateUser, getUser } = useUserStore();
 
   const [name, setName] = useState<string>("");
+
   const [phone, setPhone] = useState<string>("");
+
   const [dob, setDob] = useState<string>("");
 
   const handleSubmit = async () => {
@@ -64,11 +74,13 @@ const UserUpdateForm = ({
           </Button>
         )}
       </DialogTrigger>
+
       <DialogContent className="bg-white text-black max-sm:w-11/12">
         <DialogHeader>
           <DialogTitle>Update Employee</DialogTitle>
           <DialogDescription className="hidden">Edit Form</DialogDescription>
         </DialogHeader>
+
         <form
           onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
@@ -83,10 +95,12 @@ const UserUpdateForm = ({
               onChange={(e) => setName(e.target.value)}
             />
           </div>
+
           <div>
             <Label>Email</Label>
             <Input type="email" readOnly disabled defaultValue={user.email} />
           </div>
+
           <div>
             <Label>Phone</Label>
             <Input
@@ -95,6 +109,7 @@ const UserUpdateForm = ({
               onChange={(e) => setPhone(e.target.value)}
             />
           </div>
+
           {!user.dob && (
             <div>
               <Label>DOB</Label>
@@ -105,6 +120,7 @@ const UserUpdateForm = ({
               />
             </div>
           )}
+
           {user.dob && (
             <div>
               <Label>DOB</Label>
@@ -116,6 +132,7 @@ const UserUpdateForm = ({
               />
             </div>
           )}
+
           <DialogFooter className="pt-3">
             <DialogClose asChild>
               <Button type="submit" className="bg-[#6343d8] hover:bg-[#593cc1]">

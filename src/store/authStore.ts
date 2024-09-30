@@ -1,17 +1,22 @@
 "use client";
-import { loginData, User } from "@/utils/objectTypes";
+
+import { T_loginData, User } from "@/utils/objectTypes";
+
 import { create } from "zustand";
+
 import axios from "axios";
+
 import { toast } from "sonner";
 
 interface loginAuth {
   user: object;
-  login: (data: loginData) => Promise<User>;
+  login: (data: T_loginData) => Promise<User>;
   logout: () => void;
 }
 
 export const useAuthStore = create<loginAuth>((set) => ({
   user: {},
+
   login: async (data) => {
     try {
       const res = await axios.post(
@@ -37,6 +42,7 @@ export const useAuthStore = create<loginAuth>((set) => ({
       }, 100);
     }
   },
+
   logout: async () => {
     try {
       const res = await axios.post(

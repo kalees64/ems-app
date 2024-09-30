@@ -1,6 +1,9 @@
 import { UpdateUser, User } from "@/utils/objectTypes";
+
 import axios from "axios";
+
 import { toast } from "sonner";
+
 import { create } from "zustand";
 
 interface UserStore {
@@ -14,6 +17,7 @@ interface UserStore {
 
 export const useUserStore = create<UserStore>((set) => ({
   users: [],
+
   fetchUsers: async () => {
     try {
       const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users`);
@@ -22,6 +26,7 @@ export const useUserStore = create<UserStore>((set) => ({
       console.log(error);
     }
   },
+
   getUser: async (id) => {
     try {
       const res = await axios.get(
@@ -34,6 +39,7 @@ export const useUserStore = create<UserStore>((set) => ({
       return null;
     }
   },
+
   createUser: async (data) => {
     try {
       const res = await axios.post(
@@ -44,11 +50,13 @@ export const useUserStore = create<UserStore>((set) => ({
       return res.data.data;
     } catch (error) {
       setTimeout(() => {
-        toast.error("User Not Added");
+        toast.error("User Not Added , User Already Found");
+
         console.log(error);
       }, 100);
     }
   },
+
   updateUser: async (id, data) => {
     try {
       const res = await axios.put(
@@ -69,6 +77,7 @@ export const useUserStore = create<UserStore>((set) => ({
       }, 100);
     }
   },
+
   deleteUser: async (id) => {
     try {
       const res = await axios.delete(

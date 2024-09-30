@@ -1,16 +1,29 @@
 "use client";
+
 import React from "react";
+
 import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
+
 import { Input } from "./ui/input";
+
 import { Button } from "./ui/button";
+
 import Link from "next/link";
+
 import { toast, Toaster } from "sonner";
+
 import { SubmitHandler, useForm } from "react-hook-form";
+
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import { loginSchema } from "@/utils/formSchemas";
-import { loginData } from "@/utils/objectTypes";
+
+import { T_loginData } from "@/utils/objectTypes";
+
 import { Label } from "./ui/label";
+
 import { useAuthStore } from "@/store/authStore";
+
 import { useRouter } from "next/navigation";
 
 const Login = () => {
@@ -26,7 +39,7 @@ const Login = () => {
     },
   });
 
-  const formSubmit: SubmitHandler<loginData> = async (data) => {
+  const formSubmit: SubmitHandler<T_loginData> = async (data) => {
     try {
       const user = await login(data);
       const userRole: string = user.roles[0].key;
@@ -48,6 +61,7 @@ const Login = () => {
       return null;
     }
   };
+
   return (
     <div className="w-full h-screen flex items-center justify-center  bg-[#f1f5f9] ">
       <div className="w-96 mx-auto p-4 border max-sm:w-72 rounded-lg shadow bg-white/60 dark:bg-white text-black">
@@ -62,7 +76,9 @@ const Login = () => {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <Label className="text-[#637085]">Email</Label>
+                  <Label className="text-[#637085]">
+                    Email<span className="text-red-500">&nbsp;*</span>
+                  </Label>
                   <FormControl>
                     <Input type="text" {...field} placeholder="abc@gmail.com" />
                   </FormControl>
@@ -70,12 +86,15 @@ const Login = () => {
                 </FormItem>
               )}
             />
+
             <FormField
               name="password"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <Label className="text-[#637085]">Password</Label>
+                  <Label className="text-[#637085]">
+                    Password<span className="text-red-500">&nbsp;*</span>
+                  </Label>
                   <FormControl>
                     <Input type="password" {...field} placeholder="••••••••" />
                   </FormControl>
@@ -83,6 +102,7 @@ const Login = () => {
                 </FormItem>
               )}
             />
+
             <div className="pt-3 w-full">
               <Button
                 type="submit"
@@ -91,6 +111,7 @@ const Login = () => {
                 Login
               </Button>
             </div>
+
             <div>
               <p className="pt-2 text-[#637085]">
                 Already you have an account? &nbsp;
