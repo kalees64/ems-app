@@ -4,10 +4,10 @@ import React from "react";
 
 import { Toaster } from "sonner";
 
-const EmployeePage = ({ params }: { params: { id: string } }) => {
+const EmployeePage = () => {
   return (
     <main>
-      <UserPanel id={params.id} />
+      <UserPanel />
 
       <Toaster richColors position="top-center" />
     </main>

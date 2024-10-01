@@ -108,7 +108,7 @@ export interface ApplyLeave {
 export interface LeaveData {
   startDate: string;
   endDate: string;
-  appliedOn: string;
+  appliedOn?: string;
   approvedDate?: string;
   halfDay: boolean;
   reason: string;
@@ -116,6 +116,21 @@ export interface LeaveData {
   user: string;
   status: string;
   leaveType: string;
+  comments?: string;
+}
+
+// Leave Apply form errors  type define
+export interface LeaveDataCopy {
+  startDate?: string;
+  endDate?: string;
+  appliedOn?: string;
+  approvedDate?: string;
+  halfDay?: boolean;
+  reason?: string;
+  totalDays?: number;
+  user?: string;
+  status?: string;
+  leaveType?: string;
   comments?: string;
 }
 
@@ -138,4 +153,12 @@ export interface LeaveMail {
   assignedTo: null | User;
   user: string;
   leaveType: string;
+}
+
+// Holiday object
+export interface Holiday {
+  id?: string;
+  name: string;
+  shortDescription?: string;
+  date: string;
 }

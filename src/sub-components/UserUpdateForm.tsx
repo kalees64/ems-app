@@ -23,6 +23,8 @@ import { User } from "@/utils/objectTypes";
 
 import { Icon } from "@iconify/react/dist/iconify.js";
 
+import { format } from "date-fns";
+
 import React, { useEffect, useState } from "react";
 
 const UserUpdateForm = ({
@@ -126,7 +128,7 @@ const UserUpdateForm = ({
               <Label>DOB</Label>
               <Input
                 type="date "
-                defaultValue={user.dob ? user.dob : ""}
+                defaultValue={user.dob ? format(user.dob, "dd-MM-yyyy") : ""}
                 readOnly
                 disabled
               />

@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 
 import UserUpdateForm from "./UserUpdateForm";
@@ -6,13 +8,17 @@ import { User } from "@/utils/objectTypes";
 
 import { format } from "date-fns";
 
-const UserProfile = ({
-  user,
-  setUser,
-}: {
-  user: User;
-  setUser: (data: User) => void;
-}) => {
+const UserProfile = ({ userData }: { userData: User }) => {
+  const [user, setUser] = React.useState<User>(userData);
+
+  React.useEffect(() => {
+    if (!user) {
+      setUser(userData);
+    } else {
+      setUser(user);
+    }
+  });
+
   return (
     <div className="bg-white shadow-md rounded-lg p-6">
       <h3 className="text-xl font-bold mb-4">Profile</h3>
