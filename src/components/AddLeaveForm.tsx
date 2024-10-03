@@ -24,10 +24,14 @@ import { useLeavesStore } from "@/store/leaveStore";
 
 import { useRouter } from "next/navigation";
 
+import { useLoadStore } from "@/store/authStore";
+
 const AddLeaveForm = () => {
   const { addLeave } = useLeavesStore();
 
   const router = useRouter();
+
+  const { loading, startLoading, stopLoading } = useLoadStore();
 
   const form = useForm({
     resolver: zodResolver(leaveAddSchema),
@@ -38,14 +42,16 @@ const AddLeaveForm = () => {
   });
 
   const formSubmit: SubmitHandler<T_leaveData> = async (data: UpdateLeave) => {
+    startLoading();
     const carryForward = false;
     const name = data.name;
     if (name) {
       const key = name.replace(/\s+/g, "_").toUpperCase();
       await addLeave({ ...data, carryForward, key });
+      stopLoading();
       router.push("/admin/leave");
     }
-
+    stopLoading();
     form.reset();
   };
   return (
@@ -91,7 +97,11 @@ const AddLeaveForm = () => {
               <Button
                 type="submit"
                 className="w-full bg-[#6343d8] hover:bg-[#593cc1]"
+                disabled={loading}
               >
+                {loading && (
+                  <span className="size-5 border-4 border-gray-500 border-t-white animate-spin me-2 rounded-full"></span>
+                )}
                 Add Leave
               </Button>
             </div>

@@ -58,20 +58,7 @@ export interface UpdateUser {
   phone?: string;
   alternatePhone?: string;
   password?: string;
-  roles?: [
-    {
-      id?: string;
-      createdAt?: string;
-      updatedAt?: string;
-      title?: string;
-      key?: string;
-      description?: string;
-      active?: boolean;
-      default?: boolean;
-      users?: [string];
-      permissions?: string;
-    }
-  ];
+  roles?: string[];
 }
 
 // Leave type Predefine

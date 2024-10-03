@@ -35,8 +35,12 @@ import UserUpdateForm from "@/sub-components/UserUpdateForm";
 
 import { User } from "@/utils/objectTypes";
 
+import { useLoadStore } from "@/store/authStore";
+
 const AdminEmployeeList = () => {
   const { users, fetchUsers, deleteUser } = useUserStore();
+
+  const { loading, startLoading, stopLoading } = useLoadStore();
 
   const delUser = async (id: string) => {
     deleteUser(id);
@@ -142,9 +146,15 @@ const AdminEmployeeList = () => {
                               <Button
                                 className="bg-[#754ffe] hover:bg-[#6f42c1]"
                                 onClick={() => {
+                                  startLoading();
                                   delUser(user.id);
+                                  stopLoading();
                                 }}
+                                disabled={loading}
                               >
+                                {loading && (
+                                  <span className="size-5 border-4 border-gray-500 border-t-white animate-spin me-2 rounded-full"></span>
+                                )}
                                 Yes
                               </Button>
                             </DialogClose>

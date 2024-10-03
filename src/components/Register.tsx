@@ -26,10 +26,14 @@ import { useUserStore } from "@/store/userStore";
 
 import { useRouter } from "next/navigation";
 
+import { useLoadStore } from "@/store/authStore";
+
 const Register = ({ admin }: { admin: boolean }) => {
   const { createUser } = useUserStore();
 
   const router = useRouter();
+
+  const { loading, startLoading, stopLoading } = useLoadStore();
 
   const form = useForm({
     resolver: zodResolver(registerSchema),
@@ -42,7 +46,11 @@ const Register = ({ admin }: { admin: boolean }) => {
   });
 
   const formSubmit: SubmitHandler<T_registerData> = async (data) => {
-    const newData = { ...data, phone: "+91-" + data.phone };
+    const newData = {
+      ...data,
+      phone: "+91-" + data.phone,
+    };
+    startLoading();
     try {
       const user = await createUser(newData);
       form.reset();
@@ -52,6 +60,7 @@ const Register = ({ admin }: { admin: boolean }) => {
             toast.success("Employee Added");
           }, 100);
         }
+        stopLoading();
         return router.push("/admin");
       }
       const userRole: string = user.roles[0].key;
@@ -59,16 +68,19 @@ const Register = ({ admin }: { admin: boolean }) => {
         setTimeout(() => {
           toast.success(`Welcome ${user.name}`);
         }, 100);
+        stopLoading();
         return router.push(`/employee/${user.id}`);
-      } else if (userRole === "Admin") {
+      } else if (userRole === "ADMIN") {
         setTimeout(() => {
           toast.success(`Welcome ${user.name}`);
         }, 100);
+        stopLoading();
         return router.push(`/admin`);
       }
     } catch (error) {
       form.reset();
       console.log(error);
+      stopLoading();
       return null;
     }
   };
@@ -159,7 +171,11 @@ const Register = ({ admin }: { admin: boolean }) => {
               <Button
                 type="submit"
                 className="w-full bg-[#6343d8] hover:bg-[#593cc1]"
+                disabled={loading}
               >
+                {loading && (
+                  <span className="size-5 border-4 border-gray-500 border-t-white animate-spin me-2 rounded-full"></span>
+                )}
                 {admin ? "Add Employee" : "Register"}
               </Button>
             </div>

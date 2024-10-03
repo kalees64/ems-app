@@ -35,10 +35,14 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 
 import { Button } from "./ui/button";
 
+import { useLoadStore } from "@/store/authStore";
+
 const UserMailStatusList = ({ id }: { id: string }) => {
-  const { mails, fetchMails } = useLeaveApplyStore();
+  const { mails, fetchMails, cancelLeave } = useLeaveApplyStore();
 
   const { leaves, fetchLeaves } = useLeavesStore();
+
+  const { loading, startLoading, stopLoading } = useLoadStore();
 
   const userMails = mails.filter((mail) => mail.user === id);
 
@@ -87,7 +91,7 @@ const UserMailStatusList = ({ id }: { id: string }) => {
 
           <TableBody className="text-[#637085]">
             {userMails.length ? (
-              userMails.map((mail: LeaveMail, index: number) => {
+              userMails.reverse().map((mail: LeaveMail, index: number) => {
                 const userLeaveType = leaves.find(
                   (val) => val.id === mail.leaveType
                 );
@@ -132,9 +136,16 @@ const UserMailStatusList = ({ id }: { id: string }) => {
                     >
                       {mail.status}
                     </TableCell>
-                    <TableCell className="flex justify-center items-center">
+                    <TableCell
+                      className={`flex justify-center items-center ${
+                        mail.status === "REQUESTED" ? "" : "hidden"
+                      } `}
+                    >
                       <Dialog>
-                        <DialogTrigger asChild>
+                        <DialogTrigger
+                          asChild
+                          className="flex justify-center items-center"
+                        >
                           <Icon
                             icon="rivet-icons:close-circle"
                             fontSize={25}
@@ -155,7 +166,18 @@ const UserMailStatusList = ({ id }: { id: string }) => {
 
                           <div className="flex gap-5">
                             <DialogClose asChild>
-                              <Button className="bg-[#754ffe] hover:bg-[#6f42c1]">
+                              <Button
+                                className="bg-[#754ffe] hover:bg-[#6f42c1]"
+                                onClick={() => {
+                                  startLoading();
+                                  cancelLeave(mail.id);
+                                  stopLoading();
+                                }}
+                                disabled={loading}
+                              >
+                                {loading && (
+                                  <span className="size-5 border-4 border-gray-500 border-t-white animate-spin me-2 rounded-full"></span>
+                                )}
                                 Yes
                               </Button>
                             </DialogClose>

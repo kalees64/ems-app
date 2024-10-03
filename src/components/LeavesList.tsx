@@ -37,18 +37,25 @@ import { Label } from "./ui/label";
 
 import { Input } from "./ui/input";
 
+import { useLoadStore } from "@/store/authStore";
+
 const LeavesList = () => {
   const { leaves, fetchLeaves, deleteLeave, updateLeave } = useLeavesStore();
+
+  const { loading, startLoading, stopLoading } = useLoadStore();
 
   const [name, setName] = useState("");
 
   const [count, setCount] = useState("");
 
   const handleSubmit = async (id: string) => {
+    startLoading();
     const key = name.replace(/\s+/g, "_").toUpperCase();
     if (count) {
       updateLeave(id, { name, count, key });
+      stopLoading();
     }
+    stopLoading();
   };
 
   useEffect(() => {
@@ -143,7 +150,14 @@ const LeavesList = () => {
                                 />
                               </div>
                               <div className="pt-3">
-                                <Button type="submit" className="w-full">
+                                <Button
+                                  type="submit"
+                                  className="w-full"
+                                  disabled={loading}
+                                >
+                                  {loading && (
+                                    <span className="size-5 border-4 border-gray-500 border-t-white animate-spin me-2 rounded-full"></span>
+                                  )}
                                   Update Leave
                                 </Button>
                               </div>

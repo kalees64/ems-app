@@ -14,7 +14,7 @@ import {
 
 import UserPanelSidebar from "@/components/UserPanelSidebar";
 
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore, useLoadStore } from "@/store/authStore";
 
 import { Icon } from "@iconify/react/dist/iconify.js";
 
@@ -36,6 +36,8 @@ const UserLayout = ({
   const [side, setSide] = useState<boolean>(false);
 
   const { logout } = useAuthStore();
+
+  const { loading, startLoading, stopLoading } = useLoadStore();
 
   return (
     <main className="w-full h-screen overflow-hidden">
@@ -95,10 +97,17 @@ const UserLayout = ({
                   <div className="flex gap-5">
                     <Button
                       onClick={() => {
+                        startLoading();
                         logout();
+                        localStorage.removeItem("token");
+                        stopLoading();
                         router.push("/login");
                       }}
+                      disabled={loading}
                     >
+                      {loading && (
+                        <span className="size-5 border-4 border-gray-500 border-t-white animate-spin me-2 rounded-full"></span>
+                      )}
                       Yes
                     </Button>
 

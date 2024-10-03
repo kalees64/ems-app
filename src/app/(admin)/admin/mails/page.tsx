@@ -1,11 +1,21 @@
+"use client";
+
 import AllMails from "@/components/AllMails";
 
-import React from "react";
+import ResponsedMails from "@/components/ResponsedMails";
+
+import React, { useState } from "react";
 
 const Mails = () => {
+  const [mailState, setMailState] = useState<boolean>(true);
+
   return (
     <>
-      <AllMails />
+      {mailState ? (
+        <AllMails mailState={mailState} setMailState={setMailState} />
+      ) : (
+        <ResponsedMails mailState={mailState} setMailState={setMailState} />
+      )}
     </>
   );
 };

@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 
 import { Textarea } from "@/components/ui/textarea";
+import { useLoadStore } from "@/store/authStore";
 
 import { useLeaveApplyStore } from "@/store/leaveApplyStore";
 
@@ -34,6 +35,8 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
   const { leaves, fetchLeaves } = useLeavesStore();
 
   const { applyLeave, mails, fetchMails } = useLeaveApplyStore();
+
+  const { loading, startLoading, stopLoading } = useLoadStore();
 
   const [errors, setErrors] = useState<LeaveDataCopy>({
     leaveType: "",
@@ -57,7 +60,9 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
   const [reason, setReason] = useState<string>();
 
   const handleSubmit = async () => {
+    startLoading();
     if (!leaveType && !startDate && !endDate && !reason) {
+      stopLoading();
       return setErrors({
         leaveType: "Please select leave type",
         startDate: "Please select start date",
@@ -67,6 +72,7 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
     }
 
     if (!leaveType) {
+      stopLoading();
       return setErrors({
         ...errors,
         leaveType: "Please select leave type",
@@ -74,6 +80,7 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
     }
 
     if (!startDate) {
+      stopLoading();
       return setErrors({
         ...errors,
         startDate: "Please select start date",
@@ -81,6 +88,7 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
     }
 
     if (!endDate) {
+      stopLoading();
       return setErrors({
         ...errors,
         endDate: "Please select end date",
@@ -88,6 +96,7 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
     }
 
     if (!reason) {
+      stopLoading();
       return setErrors({
         ...errors,
         reason: "Please enter the reason",
@@ -105,6 +114,7 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
     });
 
     if (userMail) {
+      stopLoading();
       return setTimeout(() => {
         toast.error("This leave already applied");
       }, 100);
@@ -124,10 +134,19 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
       applyLeave(data);
     } catch (error) {
       console.log(error);
+      stopLoading();
       return setTimeout(() => {
         toast.error("Leave Not Applied...Smething network error");
       });
     }
+
+    setLeaveType("");
+    setStartDate("");
+    setEndDate("");
+    setHalfDay(false);
+    setTotalDays(0);
+    setReason("");
+    stopLoading();
   };
 
   useEffect(() => {
@@ -267,7 +286,7 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
                 new Date(startDate)
               );
 
-              setTotalDays(totalDays);
+              setTotalDays(totalDays + 1);
               setSameDay(false);
             }}
           />
@@ -287,20 +306,22 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
           </div>
         ) : null}
 
-        {sameDay && (
-          <div className="flex gap-8 py-3">
-            <Label>Half Day</Label>
+        <div className="pt-2">
+          {sameDay && (
+            <div className="flex gap-8  ">
+              <Label>Half Day</Label>
 
-            <Input
-              type="checkbox"
-              className="size-14"
-              checked={halfDay}
-              onChange={(e) => {
-                setHalfDay(e.target.checked);
-              }}
-            />
-          </div>
-        )}
+              <Input
+                type="checkbox"
+                className="size-14"
+                checked={halfDay}
+                onChange={(e) => {
+                  setHalfDay(e.target.checked);
+                }}
+              />
+            </div>
+          )}
+        </div>
 
         <div>
           <Label>
@@ -328,7 +349,11 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
           <Button
             type="submit"
             className="w-full bg-[#6343d8] hover:bg-[#593cc1]"
+            disabled={loading}
           >
+            {loading && (
+              <span className="size-5 border-4 border-gray-500 border-t-white animate-spin me-2 rounded-full"></span>
+            )}
             Submit Request
           </Button>
         </div>

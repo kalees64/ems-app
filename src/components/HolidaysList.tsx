@@ -36,9 +36,13 @@ import { Toaster } from "sonner";
 
 import { format } from "date-fns";
 
+import { useLoadStore } from "@/store/authStore";
+
 const HolidaysList = () => {
   const { holidays, fetchHolidays, addHoliday, updateHoliday, deleteHoliday } =
     useHolidayStore();
+
+  const { loading, startLoading, stopLoading } = useLoadStore();
 
   const [name, setName] = useState<string>("");
 
@@ -60,7 +64,9 @@ const HolidaysList = () => {
   >("");
 
   const handleSubmit = async () => {
+    startLoading();
     if (!name && !date) {
+      stopLoading();
       return setErrors({
         ...errors,
         name: "Please enter the holiday name",
@@ -69,6 +75,7 @@ const HolidaysList = () => {
     }
 
     if (!name) {
+      stopLoading();
       return setErrors({
         ...errors,
         name: "Please enter the holiday name",
@@ -76,6 +83,7 @@ const HolidaysList = () => {
     }
 
     if (!date) {
+      stopLoading();
       return setErrors({
         ...errors,
 
@@ -92,6 +100,7 @@ const HolidaysList = () => {
     setName("");
     setDate("");
     setShortDescription("");
+    stopLoading();
   };
 
   const handleUpdate = async (id: string, data: Holiday) => {
@@ -220,7 +229,11 @@ const HolidaysList = () => {
                     <Button
                       type="submit"
                       className="bg-[#754ffe] hover:bg-[#6f42c1]"
+                      disabled={loading}
                     >
+                      {loading && (
+                        <span className="size-5 border-4 border-gray-500 border-t-white animate-spin me-2 rounded-full"></span>
+                      )}
                       submit
                     </Button>
                   </form>

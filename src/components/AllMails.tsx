@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Card } from "./ui/card";
 
@@ -21,8 +21,6 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 
-import Link from "next/link";
-
 import { useLeaveApplyStore } from "@/store/leaveApplyStore";
 
 import { LeaveMail } from "@/utils/objectTypes";
@@ -39,8 +37,16 @@ import { Input } from "./ui/input";
 
 import { Button } from "./ui/button";
 
-const AllMails = () => {
-  const { mails, fetchMails } = useLeaveApplyStore();
+import { format } from "date-fns";
+
+const AllMails = ({
+  mailState,
+  setMailState,
+}: {
+  mailState: boolean;
+  setMailState: (data: boolean) => void;
+}) => {
+  const { mails, fetchMails, rejectLeave } = useLeaveApplyStore();
 
   const { users, fetchUsers } = useUserStore();
 
@@ -52,6 +58,22 @@ const AllMails = () => {
     fetchLeaves();
   }, []);
 
+  const [reason, setReason] = useState<string>("");
+
+  const [error, setError] = useState<string>("");
+
+  const handleReject = async (id: string) => {
+    if (!reason) {
+      return setError("Please enter the reason");
+    }
+
+    try {
+      await rejectLeave(id, { comments: reason, status: "REJECTED" });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const newMails = mails.filter(
     (val) => val.status === "REQUESTED" || val.status === "ON_HOLD"
   );
@@ -59,8 +81,23 @@ const AllMails = () => {
   return (
     <section className="w-full ">
       <div className="w-full flex gap-5 items-center mb-4">
-        <h2 className="text-lg font-semibold ">All Mails</h2>
-        <Link href="/admin/mails">New Mails</Link>
+        {/* <h2 className="text-lg font-semibold ">All Mails</h2> */}
+        <p
+          className="font-bold cursor-pointer"
+          onClick={() => {
+            setMailState(!mailState);
+          }}
+        >
+          New Mails
+        </p>
+        <p
+          className="cursor-pointer"
+          onClick={() => {
+            setMailState(!mailState);
+          }}
+        >
+          Responsed Mails
+        </p>
       </div>
 
       <Card className="w-full mt-5 pt-2 max-sm:px-1  relative px-4 shadow ">
@@ -90,8 +127,8 @@ const AllMails = () => {
           </TableHeader>
 
           <TableBody className="text-[#637085]">
-            {mails.length ? (
-              mails.map((mail: LeaveMail, index: number) => {
+            {newMails.length ? (
+              newMails.reverse().map((mail: LeaveMail, index: number) => {
                 const user = users.find((val) => val.id === mail.user);
                 const leaveType = leaves.find(
                   (val) => val.id === mail.leaveType
@@ -100,9 +137,18 @@ const AllMails = () => {
                   <TableRow key={mail.id}>
                     <TableCell>{index + 1}</TableCell>
                     <TableCell className="text-black">{user?.name}</TableCell>
-                    <TableCell>{mail.startDate.slice(0, 10)}</TableCell>
-                    <TableCell>{mail.endDate.slice(0, 10)}</TableCell>
-                    <TableCell>{mail.appliedOn?.slice(0, 10)}</TableCell>
+                    <TableCell>
+                      {" "}
+                      {format(mail.startDate, "dd-MM-yyyy")}
+                    </TableCell>
+                    <TableCell>{format(mail.endDate, "dd-MM-yyyy")}</TableCell>
+                    <TableCell
+                      className={`${!mail.appliedOn ? "text-center" : ""}`}
+                    >
+                      {mail.appliedOn
+                        ? format(mail.appliedOn, "dd-MM-yyyy")
+                        : "-"}
+                    </TableCell>
                     <TableCell>{mail.reason}</TableCell>
                     <TableCell>{leaveType?.name}</TableCell>
                     <TableCell className="text-black">
@@ -127,7 +173,12 @@ const AllMails = () => {
                           <DialogHeader>
                             <h1>Email Rejection Form</h1>
                           </DialogHeader>
-                          <form>
+                          <form
+                            onSubmit={(e) => {
+                              e.preventDefault();
+                              handleReject(mail.id);
+                            }}
+                          >
                             <div>
                               <Label className="font-bold">Employee Name</Label>
                               <h1>{user?.name}</h1>
@@ -148,8 +199,15 @@ const AllMails = () => {
                                 placeholder="Reason..."
                                 autoFocus
                                 type="text"
-                                required
+                                value={reason}
+                                onChange={(e) => {
+                                  setReason(e.target.value);
+                                  setError("");
+                                }}
                               />
+                              {error && (
+                                <p className="text-red-500 text-sm">{error}</p>
+                              )}
                             </div>
                             <DialogFooter className="pt-3">
                               <Button

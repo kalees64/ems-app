@@ -28,7 +28,6 @@ export const useAuthStore = create<loginAuth>((set) => ({
       setTimeout(() => {
         toast.success("Login successfull");
       }, 100);
-
       const getUser = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/users/id/${res.data.data.user.id}`
       );
@@ -61,4 +60,18 @@ export const useAuthStore = create<loginAuth>((set) => ({
       }, 100);
     }
   },
+}));
+
+interface Load {
+  loading: boolean;
+  startLoading: () => void;
+  stopLoading: () => void;
+}
+
+export const useLoadStore = create<Load>((set) => ({
+  loading: false,
+
+  startLoading: () => set({ loading: true }),
+
+  stopLoading: () => set({ loading: false }),
 }));

@@ -22,12 +22,14 @@ import { T_loginData } from "@/utils/objectTypes";
 
 import { Label } from "./ui/label";
 
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore, useLoadStore } from "@/store/authStore";
 
 import { useRouter } from "next/navigation";
 
 const Login = () => {
   const { login } = useAuthStore();
+
+  const { loading, startLoading, stopLoading } = useLoadStore();
 
   const router = useRouter();
 
@@ -40,6 +42,7 @@ const Login = () => {
   });
 
   const formSubmit: SubmitHandler<T_loginData> = async (data) => {
+    startLoading();
     try {
       const user = await login(data);
       const userRole: string = user.roles[0].key;
@@ -48,16 +51,19 @@ const Login = () => {
         setTimeout(() => {
           toast.success(`Welcome ${user.name}`);
         }, 100);
+        stopLoading();
         return router.push(`/employee/${user.id}`);
-      } else if (userRole === "Admin") {
+      } else if (userRole === "ADMIN") {
         setTimeout(() => {
           toast.success(`Welcome ${user.name}`);
         }, 100);
+        stopLoading();
         return router.push(`/admin`);
       }
     } catch (error) {
       form.reset();
       console.log(error);
+      stopLoading();
       return null;
     }
   };
@@ -107,7 +113,11 @@ const Login = () => {
               <Button
                 type="submit"
                 className="w-full bg-[#6343d8] hover:bg-[#593cc1]"
+                disabled={loading}
               >
+                {loading && (
+                  <span className="size-5 border-4 border-gray-500 border-t-white animate-spin me-2 rounded-full"></span>
+                )}
                 Login
               </Button>
             </div>
