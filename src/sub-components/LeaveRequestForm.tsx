@@ -17,13 +17,16 @@ import {
 } from "@/components/ui/select";
 
 import { Textarea } from "@/components/ui/textarea";
+
 import { useLoadStore } from "@/store/authStore";
 
 import { useLeaveApplyStore } from "@/store/leaveApplyStore";
 
+import { useLeaveBalanceStore } from "@/store/leaveBalanceStore";
+
 import { useLeavesStore } from "@/store/leaveStore";
 
-import { LeaveDataCopy, LeaveMail } from "@/utils/objectTypes";
+import { LeaveBalance, LeaveDataCopy, LeaveMail } from "@/utils/objectTypes";
 
 import { differenceInDays, isBefore, isSameDay, parseISO } from "date-fns";
 
@@ -37,6 +40,8 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
   const { applyLeave, mails, fetchMails } = useLeaveApplyStore();
 
   const { loading, startLoading, stopLoading } = useLoadStore();
+
+  const { getUserBalanceLeave } = useLeaveBalanceStore();
 
   const [errors, setErrors] = useState<LeaveDataCopy>({
     leaveType: "",
@@ -58,6 +63,15 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
   const [halfDay, setHalfDay] = useState<boolean>(false);
 
   const [reason, setReason] = useState<string>();
+
+  const [leaveBalances, setLeaveBalances] = useState<LeaveBalance[]>();
+
+  const [remainingDays, setRemainingDays] = useState<number>(0);
+
+  const getLeaveBalances = async () => {
+    const res = await getUserBalanceLeave(id);
+    setLeaveBalances(res);
+  };
 
   const handleSubmit = async () => {
     startLoading();
@@ -152,6 +166,7 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
   useEffect(() => {
     fetchLeaves();
     fetchMails();
+    getLeaveBalances();
   }, []);
 
   return (
@@ -170,6 +185,11 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
           <Select
             value={leaveType}
             onValueChange={(value) => {
+              leaveBalances?.forEach((val) => {
+                if (val.leaveType.id === value) {
+                  setRemainingDays(val.remaining);
+                }
+              });
               setLeaveType(value);
               setErrors({ ...errors, leaveType: "" });
             }}
@@ -196,6 +216,16 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
             <p className="text-red-500 text-sm">{errors.leaveType}</p>
           )}
         </div>
+
+        {leaveType ? (
+          <div>
+            <Label>
+              Remaining Days<span className="text-red-500">&nbsp;*</span>
+            </Label>
+
+            <Input readOnly value={remainingDays} />
+          </div>
+        ) : null}
 
         <div>
           <Label>
@@ -285,6 +315,17 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
                 new Date(e.currentTarget.value),
                 new Date(startDate)
               );
+
+              if (totalDays + 1 > remainingDays) {
+                return setTimeout(() => {
+                  toast.error("Total Days not Greater Than Remaing days");
+                  setSameDay(false);
+                  setErrors({
+                    ...errors,
+                    endDate: "Total Days not Greater Than Remaing days",
+                  });
+                }, 100);
+              }
 
               setTotalDays(totalDays + 1);
               setSameDay(false);

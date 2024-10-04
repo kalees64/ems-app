@@ -39,6 +39,10 @@ import { Button } from "./ui/button";
 
 import { format } from "date-fns";
 
+import { useLeaveBalanceStore } from "@/store/leaveBalanceStore";
+
+import { toast } from "sonner";
+
 const AllMails = ({
   mailState,
   setMailState,
@@ -46,29 +50,59 @@ const AllMails = ({
   mailState: boolean;
   setMailState: (data: boolean) => void;
 }) => {
-  const { mails, fetchMails, rejectLeave } = useLeaveApplyStore();
+  const { mails, fetchMails, rejectLeave, approveMail } = useLeaveApplyStore();
 
   const { users, fetchUsers } = useUserStore();
 
   const { leaves, fetchLeaves } = useLeavesStore();
 
-  useEffect(() => {
-    fetchMails();
-    fetchUsers();
-    fetchLeaves();
-  }, []);
-
   const [reason, setReason] = useState<string>("");
 
   const [error, setError] = useState<string>("");
+
+  const { balances, fetchLeaveBalances, approveLeave } = useLeaveBalanceStore();
+
+  const handleApprove = async (
+    userId: string,
+    leaveId: string,
+    totalDays: number,
+    mailId: string
+  ) => {
+    const userLeave = balances.find(
+      (val) => val.user.id === userId && val.leaveType.id === leaveId
+    );
+    const updateBalance = {
+      used: userLeave ? userLeave.used + totalDays : 0,
+      remaining: userLeave ? userLeave.remaining - totalDays : 0,
+    };
+    try {
+      const res = await approveLeave(
+        userLeave ? userLeave.id : "",
+        updateBalance
+      );
+      if (res) {
+        approveMail(mailId);
+      } else {
+        setTimeout(() => {
+          toast.error("Mail Not Approved");
+        }, 100);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleReject = async (id: string) => {
     if (!reason) {
       return setError("Please enter the reason");
     }
-
+    const today = new Date().toISOString();
     try {
-      await rejectLeave(id, { comments: reason, status: "REJECTED" });
+      await rejectLeave(id, {
+        comments: reason,
+        status: "REJECTED",
+        approvedDate: today,
+      });
     } catch (error) {
       console.log(error);
     }
@@ -77,6 +111,16 @@ const AllMails = ({
   const newMails = mails.filter(
     (val) => val.status === "REQUESTED" || val.status === "ON_HOLD"
   );
+
+  useEffect(() => {
+    fetchMails();
+    fetchUsers();
+    fetchLeaves();
+  }, []);
+
+  useEffect(() => {
+    fetchLeaveBalances();
+  }, []);
 
   return (
     <section className="w-full ">
@@ -151,7 +195,7 @@ const AllMails = ({
                     </TableCell>
                     <TableCell>{mail.reason}</TableCell>
                     <TableCell>{leaveType?.name}</TableCell>
-                    <TableCell className="text-black">
+                    <TableCell className="text-black ">
                       {mail.totalDays}
                     </TableCell>
                     <TableCell className="flex justify-center items-center gap-4">
@@ -159,6 +203,14 @@ const AllMails = ({
                         icon="duo-icons:approved"
                         fontSize={30}
                         className="cursor-pointer"
+                        onClick={() => {
+                          handleApprove(
+                            user ? user.id : "",
+                            leaveType ? leaveType.id : "",
+                            mail.totalDays,
+                            mail.id
+                          );
+                        }}
                       />
 
                       <Dialog>

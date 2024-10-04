@@ -105,6 +105,7 @@ const ResponsedMails = ({
                 const leaveType = leaves.find(
                   (val) => val.id === mail.leaveType
                 );
+
                 return (
                   <TableRow key={mail.id}>
                     <TableCell>{index + 1}</TableCell>

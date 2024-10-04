@@ -11,6 +11,7 @@ interface LeaveApplyStore {
   fetchMails: () => void;
   applyLeave: (data: LeaveData) => void;
   cancelLeave: (id: string) => void;
+  approveMail: (id: string) => void;
   rejectLeave: (id: string, data: LeaveDataCopy) => void;
 }
 
@@ -54,6 +55,24 @@ export const useLeaveApplyStore = create<LeaveApplyStore>((set) => ({
       }));
       setTimeout(() => {
         toast.success("Leave Canceled");
+      }, 100);
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  approveMail: async (id) => {
+    const today = new Date().toISOString();
+    try {
+      const res = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/leaveRequests/id/${id}`,
+        { status: "APPROVED", approvedDate: today }
+      );
+      set((state) => ({
+        mails: state.mails.map((val) => (val.id === id ? res.data.data : val)),
+      }));
+      setTimeout(() => {
+        toast.success("Leave Approved");
       }, 100);
     } catch (error) {
       console.log(error);

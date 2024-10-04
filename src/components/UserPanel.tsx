@@ -12,7 +12,7 @@ import { Bar } from "react-chartjs-2";
 
 import { Toaster } from "sonner";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import Calendar from "./Calender";
 
@@ -20,38 +20,98 @@ import { useHolidayStore } from "@/store/holidayStore";
 
 import { useUserStore } from "@/store/userStore";
 
+import { useLeaveBalanceStore } from "@/store/leaveBalanceStore";
+
 Chart.register(BarController, BarElement, CategoryScale, LinearScale);
 
+export interface BalanceLeave {
+  totalLeaves: number;
+  remainingLeaves: number;
+  sickLeaves: number;
+  casualLeaves: number;
+  paidLeaves: number;
+}
+
 const UserPanel = ({ id }: { id: string }) => {
+  const { holidaysList, fetchHolidays } = useHolidayStore();
+
+  const { getUserBalanceLeave } = useLeaveBalanceStore();
+
+  const { users, fetchUsers } = useUserStore();
+
+  const user = users.find((user) => user.id === id);
+
+  const [leaveBalace, setLeaveBalance] = useState<BalanceLeave>({
+    totalLeaves: 0,
+    remainingLeaves: 0,
+    sickLeaves: 0,
+    casualLeaves: 0,
+    paidLeaves: 0,
+  });
+
+  const getLeaveBalance = async () => {
+    const res = await getUserBalanceLeave(id);
+    let totalLeave: number = 0;
+    let balanceLeave: number = 0;
+    let sickLeave: number = 0;
+    let casualLeave: number = 0;
+    let paidLeave: number = 0;
+
+    res.forEach((val) => {
+      totalLeave += val.allocated;
+      balanceLeave += val.remaining;
+      if (val.leaveType.key === "SICK_LEAVE") {
+        sickLeave = val.used;
+      }
+      if (val.leaveType.key === "PAID_LEAVE") {
+        paidLeave = val.used;
+      }
+      if (val.leaveType.key === "CASUAL_LEAVE") {
+        casualLeave = val.used;
+      }
+    });
+    setLeaveBalance({
+      totalLeaves: totalLeave,
+      remainingLeaves: balanceLeave,
+      sickLeaves: sickLeave,
+      casualLeaves: casualLeave,
+      paidLeaves: paidLeave,
+    });
+  };
+
   // Bar chart data
   const chartData = {
-    labels: ["Casual Leave", "Sick Leave", "Paid Leave", "Pay OFF"],
+    labels: ["Casual Leave", "Sick Leave", "Paid Leave"],
     datasets: [
       {
         label: "Leave Days",
-        data: [1, 3, 5, 7, 12],
+        data: [
+          leaveBalace.casualLeaves,
+          leaveBalace.sickLeaves,
+          leaveBalace.paidLeaves,
+          12,
+        ],
         backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0"],
         borderWidth: 1,
       },
     ],
   };
 
-  const { holidaysList, fetchHolidays } = useHolidayStore();
-
-  const { users, fetchUsers } = useUserStore();
-
-  const user = users.find((user) => user.id === id);
-
   useEffect(() => {
     fetchHolidays();
     fetchUsers();
+    getLeaveBalance();
   }, []);
 
   return (
     <div className=" bg-[#f1f5f9] text-black">
       <div className="">
-        <h1 className="pb-3">
-          Welcome <span className="text-lg font-bold "> {user?.name}</span>
+        <h1 className="pb-3 font-bold">
+          Welcome &nbsp;
+          <span className="text-xl font-bold text-[#754ffe] ">
+            {" "}
+            {user?.name}
+          </span>
         </h1>
         {/* Section 1: Leave Type Widgets */}
         <div className="grid grid-cols-5 gap-4 mb-8 max-md:grid-cols-2 max-lg:grid-cols-3">
@@ -59,7 +119,7 @@ const UserPanel = ({ id }: { id: string }) => {
             <h3 className="text-lg font-semibold text-[#637085]">
               Total Leaves
             </h3>
-            <p className="text-2xl font-bold">32</p>
+            <p className="text-2xl font-bold">{leaveBalace.totalLeaves}</p>
             <p className="text-sm text-[#637085]">Days</p>
           </div>
 
@@ -67,7 +127,7 @@ const UserPanel = ({ id }: { id: string }) => {
             <h3 className="text-lg font-semibold text-[#637085]">
               Pending Leaves
             </h3>
-            <p className="text-2xl font-bold">32</p>
+            <p className="text-2xl font-bold">{leaveBalace.remainingLeaves}</p>
             <p className="text-sm text-[#637085]">Days</p>
           </div>
 
@@ -75,7 +135,7 @@ const UserPanel = ({ id }: { id: string }) => {
             <h3 className="text-lg font-semibold text-[#637085]">
               Casual Leaves
             </h3>
-            <p className="text-2xl font-bold">0</p>
+            <p className="text-2xl font-bold">{leaveBalace.casualLeaves}</p>
             <p className="text-sm text-[#637085]">Days</p>
           </div>
 
@@ -83,7 +143,7 @@ const UserPanel = ({ id }: { id: string }) => {
             <h3 className="text-lg font-semibold text-[#637085]">
               Sick Leaves
             </h3>
-            <p className="text-2xl font-bold">0</p>
+            <p className="text-2xl font-bold">{leaveBalace.sickLeaves}</p>
             <p className="text-sm text-[#637085]">Days</p>
           </div>
 
@@ -91,7 +151,7 @@ const UserPanel = ({ id }: { id: string }) => {
             <h3 className="text-lg font-semibold text-[#637085]">
               Paid Leaves
             </h3>
-            <p className="text-2xl font-bold">0</p>
+            <p className="text-2xl font-bold">{leaveBalace.paidLeaves}</p>
             <p className="text-sm text-[#637085]">Days</p>
           </div>
         </div>

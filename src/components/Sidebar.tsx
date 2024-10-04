@@ -48,6 +48,7 @@ const Sidebar = ({
 
         <div
           onClick={() => {
+            router.push("/admin/reports");
             setSide?.(!side);
           }}
           className="text-[#637085] hover:text-[#94A3B8] p-2 rounded flex gap-4 items-center cursor-pointer"

@@ -149,3 +149,25 @@ export interface Holiday {
   shortDescription?: string;
   date: string;
 }
+
+// Leave Balance
+export interface LeaveBalance {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  allocated: number;
+  used: number;
+  remaining: number;
+  leaveType: Leave;
+  user: User;
+}
+
+// Update LeaveBalance
+export interface UptLeaveBalance {
+  id?: string;
+  allocated?: number;
+  used: number;
+  remaining: number;
+  leaveType?: Leave;
+  user?: User;
+}
