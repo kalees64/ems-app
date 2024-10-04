@@ -48,7 +48,7 @@ const UserLayout = ({
 
         <div className="flex-1 flex flex-col bg-[#f1f5f9] text-black h-screen w-full overflow-x-scroll">
           {/* Nav Bar */}
-          <div className="flex justify-between items-center mb-6 border-b-2 px-6 py-4 bg-white lg:justify-end">
+          <div className="flex justify-between items-center  border-b-2 px-6 py-4 bg-white lg:justify-end">
             <h1
               className="text-2xl font-bold max-md:text-xl max-sm:text-lg cursor-pointer lg:hidden"
               onClick={() => {

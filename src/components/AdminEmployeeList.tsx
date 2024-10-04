@@ -2,7 +2,7 @@
 
 import { Icon } from "@iconify/react/dist/iconify.js";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Card, CardContent } from "./ui/card";
 
@@ -36,6 +36,7 @@ import UserUpdateForm from "@/sub-components/UserUpdateForm";
 import { User } from "@/utils/objectTypes";
 
 import { useLoadStore } from "@/store/authStore";
+import { Input } from "./ui/input";
 
 const AdminEmployeeList = () => {
   const { users, fetchUsers, deleteUser } = useUserStore();
@@ -46,8 +47,15 @@ const AdminEmployeeList = () => {
     deleteUser(id);
   };
 
+  const [searchUsers, setSearchUsers] = useState<User[]>(users);
+
+  const [search, setSearch] = useState<string>("");
+
   useEffect(() => {
     fetchUsers();
+    if (!search.length) {
+      setSearchUsers(users);
+    }
   }, []);
 
   return (
@@ -64,8 +72,8 @@ const AdminEmployeeList = () => {
         </Link>
       </div>
 
-      <div className="w-80">
-        <Card className="">
+      <div className="w-full flex justify-between">
+        <Card className="w-80">
           <CardContent className="flex pt-4">
             <div className="flex flex-col justify-center gap-3 ">
               <h1 className="text-[#637085]">Total Employees</h1>
@@ -87,10 +95,36 @@ const AdminEmployeeList = () => {
       </div>
 
       <Card className="w-full mt-5 pt-2 max-sm:px-1  relative px-4 shadow ">
-        <h2 className="text-lg font-semibold ps-2 pb-2 pt-2">
-          Employees List ({users ? users.length : 0}){" "}
-        </h2>
-
+        <div className="w-full flex justify-between items-center pt-2 pb-4">
+          <h2 className="text-lg font-semibold ps-2 ">
+            Employees List ({users ? users.length : 0}){" "}
+          </h2>
+          <div className="w-80 px-5 flex items-end">
+            <Input
+              className="border-2 outline-2 border-[#637085]  focus-visible:ring-0"
+              placeholder="Search Employee Name / Email / Phone"
+              value={search}
+              onChange={(e) => {
+                if (!e.target.value.length) {
+                  setSearchUsers(users);
+                }
+                setSearch(e.target.value);
+                setSearchUsers(
+                  users.filter(
+                    (user) =>
+                      user.name
+                        .toLowerCase()
+                        .includes(e.target.value.toLowerCase()) ||
+                      user.email
+                        .toLowerCase()
+                        .includes(e.target.value.toLowerCase()) ||
+                      user.phone.includes(e.target.value)
+                  )
+                );
+              }}
+            />
+          </div>
+        </div>
         <Table>
           <TableHeader>
             <TableRow className="bg-[#f1f5f9]">
@@ -111,8 +145,8 @@ const AdminEmployeeList = () => {
           </TableHeader>
 
           <TableBody className="text-[#637085]">
-            {users?.length ? (
-              users.map((user: User, index: number) => {
+            {searchUsers?.length ? (
+              searchUsers.map((user: User, index: number) => {
                 return (
                   <TableRow key={user.id}>
                     <TableCell>{index + 1}</TableCell>
@@ -122,7 +156,11 @@ const AdminEmployeeList = () => {
                     <TableCell className="flex items-center gap-3 justify-center">
                       {/* Employee Editing Form */}
 
-                      <UserUpdateForm user={user} admin={true} />
+                      <UserUpdateForm
+                        user={user}
+                        admin={true}
+                        setSearchUsers={setSearchUsers}
+                      />
 
                       <Dialog>
                         <DialogTrigger asChild>

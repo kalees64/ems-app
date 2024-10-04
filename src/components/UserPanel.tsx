@@ -18,9 +18,11 @@ import Calendar from "./Calender";
 
 import { useHolidayStore } from "@/store/holidayStore";
 
+import { useUserStore } from "@/store/userStore";
+
 Chart.register(BarController, BarElement, CategoryScale, LinearScale);
 
-const UserPanel = () => {
+const UserPanel = ({ id }: { id: string }) => {
   // Bar chart data
   const chartData = {
     labels: ["Casual Leave", "Sick Leave", "Paid Leave", "Pay OFF"],
@@ -36,13 +38,21 @@ const UserPanel = () => {
 
   const { holidaysList, fetchHolidays } = useHolidayStore();
 
+  const { users, fetchUsers } = useUserStore();
+
+  const user = users.find((user) => user.id === id);
+
   useEffect(() => {
     fetchHolidays();
+    fetchUsers();
   }, []);
 
   return (
     <div className=" bg-[#f1f5f9] text-black">
       <div className="">
+        <h1 className="pb-3">
+          Welcome <span className="text-lg font-bold "> {user?.name}</span>
+        </h1>
         {/* Section 1: Leave Type Widgets */}
         <div className="grid grid-cols-5 gap-4 mb-8 max-md:grid-cols-2 max-lg:grid-cols-3">
           <div className="p-4 bg-white shadow-md rounded-lg text-center">

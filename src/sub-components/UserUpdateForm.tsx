@@ -31,12 +31,14 @@ const UserUpdateForm = ({
   user,
   setUser,
   admin,
+  setSearchUsers,
 }: {
   user: User;
   setUser?: (data: User) => void;
   admin?: boolean;
+  setSearchUsers?: (data: User[]) => void;
 }) => {
-  const { updateUser, getUser } = useUserStore();
+  const { updateUser, getUser, users, fetchUsers } = useUserStore();
 
   const [name, setName] = useState<string>("");
 
@@ -53,6 +55,9 @@ const UserUpdateForm = ({
     await updateUser(user.id, newUserData);
     const updatedUser = await getUser(user.id);
     setUser?.(updatedUser);
+    setSearchUsers?.(
+      users.map((val) => (val.id === user.id ? updatedUser : val))
+    );
   };
 
   const setValues = () => {
@@ -63,6 +68,7 @@ const UserUpdateForm = ({
 
   useEffect(() => {
     setValues();
+    fetchUsers();
   }, []);
 
   return (
