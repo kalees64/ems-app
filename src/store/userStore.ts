@@ -9,6 +9,7 @@ import { create } from "zustand";
 interface UserStore {
   users: User[];
   fetchUsers: () => void;
+  getAllUsers: () => Promise<User[]>;
   getUser: (id: string) => Promise<User>;
   createUser: (data: UpdateUser) => Promise<User>;
   updateUser: (id: string, data: UpdateUser) => void;
@@ -22,6 +23,16 @@ export const useUserStore = create<UserStore>((set) => ({
     try {
       const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users`);
       set({ users: res.data.data });
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  getAllUsers: async () => {
+    try {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users`);
+      set({ users: res.data.data });
+      return res.data.data;
     } catch (error) {
       console.log(error);
     }

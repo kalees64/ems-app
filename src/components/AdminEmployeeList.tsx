@@ -39,7 +39,7 @@ import { useLoadStore } from "@/store/authStore";
 import { Input } from "./ui/input";
 
 const AdminEmployeeList = () => {
-  const { users, fetchUsers, deleteUser } = useUserStore();
+  const { users, fetchUsers, deleteUser, getAllUsers } = useUserStore();
 
   const { loading, startLoading, stopLoading } = useLoadStore();
 
@@ -47,12 +47,18 @@ const AdminEmployeeList = () => {
     deleteUser(id);
   };
 
-  const [searchUsers, setSearchUsers] = useState<User[]>(users);
+  const [searchUsers, setSearchUsers] = useState<User[]>();
 
   const [search, setSearch] = useState<string>("");
 
+  const startup = async () => {
+    const res = await getAllUsers();
+    setSearchUsers(res);
+  };
+
   useEffect(() => {
     fetchUsers();
+    startup();
     if (!search.length) {
       setSearchUsers(users);
     }
