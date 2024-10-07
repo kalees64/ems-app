@@ -20,7 +20,7 @@ import Sidebar from "./Sidebar";
 
 import { useRouter } from "next/navigation";
 
-import { useAuthStore, useLoadStore } from "@/store/authStore";
+import { useLoadStore } from "@/store/authStore";
 
 const Navbar = () => {
   const [side, setSide] = useState<boolean>(false);
@@ -28,8 +28,6 @@ const Navbar = () => {
   const router = useRouter();
 
   const { loading, startLoading, stopLoading } = useLoadStore();
-
-  const { logout } = useAuthStore();
 
   return (
     <div className="flex items-center justify-between bg-white p-4 shadow-md text-black relative">
@@ -69,7 +67,7 @@ const Navbar = () => {
                 className="bg-[#754ffe] hover:bg-[#6f42c1]"
                 onClick={() => {
                   startLoading();
-                  logout();
+                  // logout();
                   localStorage.removeItem("token");
                   stopLoading();
                   router.push("/login");

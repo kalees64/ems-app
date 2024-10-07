@@ -358,6 +358,11 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
                 checked={halfDay}
                 onChange={(e) => {
                   setHalfDay(e.target.checked);
+                  if (e.target.checked) {
+                    setTotalDays(totalDays - 0.5);
+                  } else {
+                    setTotalDays(totalDays + 0.5);
+                  }
                 }}
               />
             </div>

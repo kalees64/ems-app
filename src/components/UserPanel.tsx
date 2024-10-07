@@ -22,6 +22,9 @@ import { useUserStore } from "@/store/userStore";
 
 import { useLeaveBalanceStore } from "@/store/leaveBalanceStore";
 
+import { User } from "@/utils/objectTypes";
+import { Card } from "./ui/card";
+
 Chart.register(BarController, BarElement, CategoryScale, LinearScale);
 
 export interface BalanceLeave {
@@ -37,7 +40,7 @@ const UserPanel = ({ id }: { id: string }) => {
 
   const { getUserBalanceLeave } = useLeaveBalanceStore();
 
-  const { users, fetchUsers } = useUserStore();
+  const { users, fetchUsers, getAllUsers } = useUserStore();
 
   const user = users.find((user) => user.id === id);
 
@@ -97,22 +100,64 @@ const UserPanel = ({ id }: { id: string }) => {
     ],
   };
 
+  const [birUser, setBirUser] = useState<User[]>();
+
+  const getBirthDay = async () => {
+    const all = await getAllUsers();
+    const date = new Date();
+    const day = date.getDate().toString();
+    const toDay = day.length < 2 ? "0" + day : day;
+    const month = Number(date.getMonth()) + 1;
+    const month1 = month.toString();
+    const toMonth = month1.length < 2 ? "0" + month1 : month1;
+    const findUser = all.filter((user: User) => {
+      try {
+        const userMonth = user.dob.slice(5, 7);
+        const userDay = user.dob.slice(8, 10);
+        if (userMonth == toMonth && userDay == toDay) {
+          return user;
+        }
+      } catch (error) {
+        console.log(error);
+        return null;
+      }
+    });
+    setBirUser(findUser);
+  };
+
   useEffect(() => {
     fetchHolidays();
     fetchUsers();
     getLeaveBalance();
+    getBirthDay();
   }, []);
 
   return (
     <div className=" bg-[#f1f5f9] text-black">
       <div className="">
-        <h1 className="pb-3 font-bold">
+        <h1 className="pb-3 font-bold hidden">
           Welcome &nbsp;
           <span className="text-xl font-bold text-[#754ffe] ">
             {" "}
             {user?.name}
           </span>
         </h1>
+
+        {/* Birthday wish section */}
+        {birUser &&
+          (birUser.length ? (
+            <Card className="w-11/12 mx-auto py-2 animate-pulse  rounded flex flex-col justify-center items-center mb-3 max-sm:h-20 max-sm:ps-5">
+              {birUser.map((user: User) => {
+                const role = user.roles[0].title;
+                return (
+                  <h1 key={user.id} className="max-sm:text-sm">
+                    {role} <b>{user.name}</b> celebrating his birthday today !!!
+                  </h1>
+                );
+              })}
+            </Card>
+          ) : null)}
+
         {/* Section 1: Leave Type Widgets */}
         <div className="grid grid-cols-5 gap-4 mb-8 max-md:grid-cols-2 max-lg:grid-cols-3">
           <div className="p-4 bg-white shadow-md rounded-lg text-center">

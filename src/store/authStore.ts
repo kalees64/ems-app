@@ -55,7 +55,7 @@ export const useAuthStore = create<loginAuth>((set) => ({
       }, 100);
     } catch (error) {
       setTimeout(() => {
-        toast.error("Invalid Email & Password");
+        toast.error("");
         console.log(error);
       }, 100);
     }

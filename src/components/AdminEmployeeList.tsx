@@ -192,6 +192,10 @@ const AdminEmployeeList = () => {
                                 onClick={() => {
                                   startLoading();
                                   delUser(user.id);
+                                  const remainsUsers = users.filter(
+                                    (val) => val.id !== user.id
+                                  );
+                                  setSearchUsers(remainsUsers);
                                   stopLoading();
                                 }}
                                 disabled={loading}
