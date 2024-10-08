@@ -38,7 +38,6 @@ import { CustomTable } from "@/sub-components/CustomTable";
 import { format } from "date-fns";
 
 import { Label } from "./ui/label";
-import UserUpdateForm from "@/sub-components/UserUpdateForm";
 
 const AdminEmployeeList = () => {
   const { users, fetchUsers, deleteUser, updateUser } = useUserStore();
@@ -62,7 +61,7 @@ const AdminEmployeeList = () => {
       dob,
     };
     console.log(newUserData);
-    // await updateUser(id, newUserData);
+    await updateUser(id, newUserData);
   };
 
   const columns: ColumnDef<User>[] = [
