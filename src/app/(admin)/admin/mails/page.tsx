@@ -1,21 +1,51 @@
 "use client";
 
+import AdminAllMails from "@/components/AdminAllMails";
+
 import AllMails from "@/components/AllMails";
+
+import CancelledMails from "@/components/CancelledMails";
+
+import RejectedMails from "@/components/RejectedMails";
 
 import ResponsedMails from "@/components/ResponsedMails";
 
-import React, { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import React from "react";
 
 const Mails = () => {
-  const [mailState, setMailState] = useState<boolean>(true);
-
   return (
     <>
-      {mailState ? (
-        <AllMails mailState={mailState} setMailState={setMailState} />
-      ) : (
-        <ResponsedMails mailState={mailState} setMailState={setMailState} />
-      )}
+      <Tabs defaultValue="pending">
+        <TabsList>
+          <TabsTrigger value="pending">Pending</TabsTrigger>
+          <TabsTrigger value="approved">Approved</TabsTrigger>
+          <TabsTrigger value="rejected">Rejected</TabsTrigger>
+          <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
+          <TabsTrigger value="all">All</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="pending">
+          <AllMails />
+        </TabsContent>
+
+        <TabsContent value="approved">
+          <ResponsedMails />
+        </TabsContent>
+
+        <TabsContent value="rejected">
+          <RejectedMails />
+        </TabsContent>
+
+        <TabsContent value="cancelled">
+          <CancelledMails />
+        </TabsContent>
+
+        <TabsContent value="all">
+          <AdminAllMails />
+        </TabsContent>
+      </Tabs>
     </>
   );
 };

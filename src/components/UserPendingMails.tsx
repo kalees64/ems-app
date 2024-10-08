@@ -24,26 +24,28 @@ import { Button } from "./ui/button";
 
 import { ColumnDef } from "@tanstack/react-table";
 
-import { CustomTable } from "@/sub-components/CustomTable";
+import { TbMailCancel } from "react-icons/tb";
 
 import { LuArrowDownUp } from "react-icons/lu";
 
-import { TbMailCancel } from "react-icons/tb";
-
-import { Label } from "./ui/label";
+import { CustomTable } from "@/sub-components/CustomTable";
 
 import { useUserStore } from "@/store/userStore";
 
 import { Input } from "./ui/input";
 
-const UserMailStatusList = ({ id }: { id: string }) => {
+import { Label } from "./ui/label";
+
+const UserPendingMails = ({ id }: { id: string }) => {
   const { mails, fetchMails } = useLeaveApplyStore();
 
   const { leaves, fetchLeaves } = useLeavesStore();
 
-  const { users, fetchUsers } = useUserStore();
+  const userMails = mails.filter(
+    (mail) => mail.user === id && mail.status === "REQUESTED"
+  );
 
-  const userMails = mails.filter((mail) => mail.user === id);
+  const { users, fetchUsers } = useUserStore();
 
   const [reason, setReason] = useState<string>("");
 
@@ -137,10 +139,7 @@ const UserMailStatusList = ({ id }: { id: string }) => {
       header: "Total Days",
       accessorKey: "totalDays",
     },
-    {
-      header: "Comments",
-      accessorKey: "comments",
-    },
+
     {
       header: "Status",
       accessorKey: "status",
@@ -248,12 +247,13 @@ const UserMailStatusList = ({ id }: { id: string }) => {
     <section className="w-full ">
       <Card className="w-full max-sm:px-1  relative  shadow ">
         <h2 className="text-lg font-semibold ps-2 pb-4 pt-2">
-          All Mails ({userMails ? userMails.length : 0})
+          Pending Mails ({userMails ? userMails.length : 0})
         </h2>
+
         <CustomTable
           columns={colums}
           data={userMails}
-          placeholder="Filter by reason..."
+          placeholder="Filter by reason"
           searchColumn="reason"
           hideSearch={true}
         />
@@ -262,4 +262,4 @@ const UserMailStatusList = ({ id }: { id: string }) => {
   );
 };
 
-export default UserMailStatusList;
+export default UserPendingMails;

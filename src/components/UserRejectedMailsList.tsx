@@ -8,51 +8,32 @@ import { useLeaveApplyStore } from "@/store/leaveApplyStore";
 
 import { LeaveMail } from "@/utils/objectTypes";
 
-import { useUserStore } from "@/store/userStore";
+import { format } from "date-fns";
 
 import { useLeavesStore } from "@/store/leaveStore";
 
-import { format } from "date-fns";
-
 import { ColumnDef } from "@tanstack/react-table";
-
-import { CustomTable } from "@/sub-components/CustomTable";
 
 import { LuArrowDownUp } from "react-icons/lu";
 
-const ResponsedMails = () => {
-  const { mails, fetchMails } = useLeaveApplyStore();
+import { CustomTable } from "@/sub-components/CustomTable";
 
-  const { users, fetchUsers } = useUserStore();
+const UserRejectedMailsList = ({ id }: { id: string }) => {
+  const { mails, fetchMails } = useLeaveApplyStore();
 
   const { leaves, fetchLeaves } = useLeavesStore();
 
-  const columns: ColumnDef<LeaveMail>[] = [
+  const userMails = mails.filter(
+    (mail) => mail.user === id && mail.status === "REJECTED"
+  );
+
+  const colums: ColumnDef<LeaveMail>[] = [
     {
       header: "S.No",
-      accessorFn: (_, index) => {
-        return index + 1;
-      },
+      accessorFn: (_, index) => index + 1,
     },
     {
-      header: ({ column }) => {
-        return (
-          <span
-            className="flex items-center cursor-pointer gap-1"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Employee Name
-            <LuArrowDownUp className=" h-3 w-3 " />
-          </span>
-        );
-      },
-      accessorKey: "user",
-      cell: ({ row }) => {
-        const user = users.find((val) => val.id === row.original.user);
-        return user?.name;
-      },
-    },
-    {
+      accessorKey: "startDate",
       header: ({ column }) => {
         return (
           <span
@@ -64,47 +45,37 @@ const ResponsedMails = () => {
           </span>
         );
       },
-      accessorKey: "startDate",
       cell: ({ row }) => {
         return format(row.original.startDate, "dd-MM-yyyy");
       },
     },
+
     {
-      header: "End Date",
       accessorKey: "endDate",
+      header: "End Date",
       cell: ({ row }) => {
         return format(row.original.endDate, "dd-MM-yyyy");
       },
     },
     {
-      header: ({ column }) => {
-        return (
-          <span
-            className="flex items-center cursor-pointer gap-1"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Request Date
-            <LuArrowDownUp className=" h-3 w-3 " />
-          </span>
-        );
-      },
+      header: "Request Date",
       accessorKey: "appliedOn",
       cell: ({ row }) => {
         if (row.original.appliedOn) {
           return format(row.original.appliedOn, "dd-MM-yyyy");
         } else {
-          return "-";
+          return "...";
         }
       },
     },
     {
-      header: "Responsed Date",
+      header: "Approved Date",
       accessorKey: "approvedDate",
       cell: ({ row }) => {
         if (row.original.approvedDate) {
           return format(row.original.approvedDate, "dd-MM-yyyy");
         } else {
-          return "-";
+          return "...";
         }
       },
     },
@@ -116,10 +87,10 @@ const ResponsedMails = () => {
       header: "Leave Type",
       accessorKey: "leaveType",
       cell: ({ row }) => {
-        const leaveType = leaves.find(
+        const userLeave = leaves.find(
           (val) => val.id === row.original.leaveType
         );
-        return leaveType?.name;
+        return userLeave?.name;
       },
     },
     {
@@ -127,34 +98,51 @@ const ResponsedMails = () => {
       accessorKey: "totalDays",
     },
     {
+      header: "Comments",
+      accessorKey: "comments",
+    },
+    {
       header: "Status",
       accessorKey: "status",
       cell: ({ row }) => {
-        return <span className="text-lime-500">{row.original.status}</span>;
+        return (
+          <span
+            className={`${
+              row.original.status === "APPROVED"
+                ? "text-lime-500"
+                : row.original.status === "PENDING"
+                ? "text-yellow-500"
+                : "text-red-500"
+            }`}
+          >
+            {row.original.status}
+          </span>
+        );
       },
     },
   ];
 
   useEffect(() => {
     fetchMails();
-    fetchUsers();
     fetchLeaves();
   }, []);
 
-  const oldMails = mails.filter((val) => val.status === "APPROVED");
+  if (!mails) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <section className="w-full ">
-      <Card className="w-full mt-5 pt-2 max-sm:px-1  relative px-4 shadow ">
-        <h2 className="text-lg font-semibold ps-2 pb-2 pt-2">
-          Approved Mails ({oldMails.length}){" "}
+      <Card className="w-full max-sm:px-1  relative  shadow ">
+        <h2 className="text-lg font-semibold ps-2 pb-4 pt-2">
+          Rejected Mails ({userMails ? userMails.length : 0})
         </h2>
 
         <CustomTable
-          columns={columns}
-          data={oldMails}
-          placeholder="Filter by Name..."
-          searchColumn="user"
+          columns={colums}
+          data={userMails}
+          placeholder="Filter by reason"
+          searchColumn="reason"
           hideSearch={true}
         />
       </Card>
@@ -162,4 +150,4 @@ const ResponsedMails = () => {
   );
 };
 
-export default ResponsedMails;
+export default UserRejectedMailsList;

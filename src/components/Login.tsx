@@ -8,8 +8,6 @@ import { Input } from "./ui/input";
 
 import { Button } from "./ui/button";
 
-import Link from "next/link";
-
 import { toast, Toaster } from "sonner";
 
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -122,14 +120,14 @@ const Login = () => {
               </Button>
             </div>
 
-            <div>
+            {/* <div>
               <p className="pt-2 text-[#637085]">
                 Already you have an account? &nbsp;
                 <Link href="/register" className="text-red-500">
                   Register
                 </Link>
               </p>
-            </div>
+            </div> */}
           </form>
         </Form>
       </div>

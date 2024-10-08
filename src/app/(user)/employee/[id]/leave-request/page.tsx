@@ -5,7 +5,7 @@ import React from "react";
 const EmployeeLeaveRequestPage = ({ params }: { params: { id: string } }) => {
   return (
     <section className="w-full ">
-      <div className="bg-white shadow-md rounded-lg p-4 w-96 mx-auto ">
+      <div className="bg-white shadow-md rounded-lg p-4 w-8/12 max-sm:w-11/12 mx-auto ">
         <h3 className="text-xl font-bold pb-2">Request Leave</h3>
 
         <LeaveRequestForm id={params.id} />

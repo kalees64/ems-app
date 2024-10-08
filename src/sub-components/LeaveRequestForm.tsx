@@ -28,16 +28,24 @@ import { useLeavesStore } from "@/store/leaveStore";
 
 import { LeaveBalance, LeaveDataCopy, LeaveMail } from "@/utils/objectTypes";
 
-import { differenceInDays, isBefore, isSameDay, parseISO } from "date-fns";
+import { format, isBefore, isSameDay, parseISO } from "date-fns";
 
 import React, { useEffect, useState } from "react";
 
 import { toast } from "sonner";
 
+import LeaveFormPageLeaves from "./LeaveFormPageLeaves";
+
+import { useRouter } from "next/navigation";
+
+import axios from "axios";
+
 const LeaveRequestForm = ({ id }: { id: string }) => {
+  const router = useRouter();
+
   const { leaves, fetchLeaves } = useLeavesStore();
 
-  const { applyLeave, mails, fetchMails } = useLeaveApplyStore();
+  const { mails, fetchMails } = useLeaveApplyStore();
 
   const { loading, startLoading, stopLoading } = useLoadStore();
 
@@ -143,16 +151,12 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
       reason,
       user: id,
       status: "REQUESTED",
+      assignedTo: "jk1@assaycr.com",
     };
-    try {
-      applyLeave(data);
-    } catch (error) {
-      console.log(error);
-      stopLoading();
-      return setTimeout(() => {
-        toast.error("Leave Not Applied...Smething network error");
-      });
-    }
+
+    localStorage.setItem("formData", JSON.stringify(data));
+
+    router.push(`/employee/${id}/leave-request/view`);
 
     setLeaveType("");
     setStartDate("");
@@ -163,6 +167,14 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
     stopLoading();
   };
 
+  const getTotalLeaves = async (d1: string, d2: string) => {
+    const res = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/leaveRequests/calculateDays?startDate=${d1}&endDate=${d2}`
+    );
+    const totalDays = res.data.data.noofDays;
+    return totalDays;
+  };
+
   useEffect(() => {
     fetchLeaves();
     fetchMails();
@@ -170,12 +182,13 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
   }, []);
 
   return (
-    <div>
+    <div className="flex max-sm:w-96 max-sm:flex-col gap-5 ">
       <form
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
         }}
+        className="w-96 "
       >
         <div>
           <Label>
@@ -219,11 +232,9 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
 
         {leaveType ? (
           <div>
-            <Label>
-              Remaining Days<span className="text-red-500">&nbsp;*</span>
-            </Label>
+            <Label>Available Days</Label>
 
-            <Input readOnly value={remainingDays} />
+            <Input readOnly value={remainingDays} disabled />
           </div>
         ) : null}
 
@@ -272,8 +283,9 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
 
           <Input
             type="date"
+            max={remainingDays}
             value={endDate}
-            onChange={(e) => {
+            onChange={async (e) => {
               setTotalDays(0);
               const date = parseISO(e.target.value);
               const start = parseISO(startDate);
@@ -285,7 +297,7 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
                   setSameDay(false);
                   setErrors({
                     ...errors,
-                    endDate: "Select Start Date First",
+                    endDate: "Select start date first",
                   });
                 }, 100);
               }
@@ -311,23 +323,29 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
 
               setEndDate(e.target.value);
               setErrors({ ...errors, endDate: "" });
-              const totalDays = differenceInDays(
-                new Date(e.currentTarget.value),
-                new Date(startDate)
+              // const totalDays = differenceInDays(
+              //   new Date(e.currentTarget.value),
+              //   new Date(startDate)
+              // );
+              const total = await getTotalLeaves(
+                format(startDate, "yyyy-MM-dd"),
+                format(e.target.value, "yyyy-MM-dd")
               );
 
-              if (totalDays + 1 > remainingDays) {
+              const totalDays = Number(total);
+
+              if (totalDays > remainingDays) {
                 return setTimeout(() => {
-                  toast.error("Total Days not Greater Than Remaing days");
+                  toast.error("Total days not greater than remaing days");
                   setSameDay(false);
                   setErrors({
                     ...errors,
-                    endDate: "Total Days not Greater Than Remaing days",
+                    endDate: "Total days not greater than remaing days",
                   });
                 }, 100);
               }
 
-              setTotalDays(totalDays + 1);
+              setTotalDays(totalDays);
               setSameDay(false);
             }}
           />
@@ -343,7 +361,7 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
               Total Days<span className="text-red-500">&nbsp;*</span>
             </Label>
 
-            <Input readOnly value={totalDays} />
+            <Input readOnly value={totalDays} disabled />
           </div>
         ) : null}
 
@@ -391,6 +409,14 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
           )}
         </div>
 
+        <div>
+          <Label>
+            Assigned To<span className="text-red-500">&nbsp;*</span>
+          </Label>
+
+          <Input readOnly value="jk1@assarcr.com" disabled />
+        </div>
+
         <div className="pt-3">
           <Button
             type="submit"
@@ -404,6 +430,9 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
           </Button>
         </div>
       </form>
+      <div className="w-96 bg-red-500 h-full ">
+        <LeaveFormPageLeaves id={id} />
+      </div>
     </div>
   );
 };

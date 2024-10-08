@@ -7,19 +7,11 @@ import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "./ui/card";
 
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "./ui/table";
-
-import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -31,15 +23,25 @@ import { useUserStore } from "@/store/userStore";
 
 import { Button } from "./ui/button";
 
-import UserUpdateForm from "@/sub-components/UserUpdateForm";
-
 import { User } from "@/utils/objectTypes";
 
 import { useLoadStore } from "@/store/authStore";
+
 import { Input } from "./ui/input";
 
+import { ColumnDef } from "@tanstack/react-table";
+
+import { LuArrowDownUp } from "react-icons/lu";
+
+import { CustomTable } from "@/sub-components/CustomTable";
+
+import { format } from "date-fns";
+
+import { Label } from "./ui/label";
+import UserUpdateForm from "@/sub-components/UserUpdateForm";
+
 const AdminEmployeeList = () => {
-  const { users, fetchUsers, deleteUser, getAllUsers } = useUserStore();
+  const { users, fetchUsers, deleteUser, updateUser } = useUserStore();
 
   const { loading, startLoading, stopLoading } = useLoadStore();
 
@@ -47,21 +49,257 @@ const AdminEmployeeList = () => {
     deleteUser(id);
   };
 
-  const [searchUsers, setSearchUsers] = useState<User[]>();
+  const [name, setName] = useState<string>("");
 
-  const [search, setSearch] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
 
-  const startup = async () => {
-    const res = await getAllUsers();
-    setSearchUsers(res);
+  const [dob, setDob] = useState<string>("");
+
+  const handleSubmit = async (id: string) => {
+    const newUserData = {
+      name,
+      phone,
+      dob,
+    };
+    console.log(newUserData);
+    // await updateUser(id, newUserData);
   };
+
+  const columns: ColumnDef<User>[] = [
+    {
+      header: "S.No",
+      accessorFn: (_, index) => {
+        return index + 1;
+      },
+    },
+    {
+      header: ({ column }) => {
+        return (
+          <span
+            className="flex items-center cursor-pointer gap-1"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Name
+            <LuArrowDownUp className=" h-3 w-3 " />
+          </span>
+        );
+      },
+      accessorKey: "name",
+      cell: ({ row }) => {
+        return (
+          <Link href={`/admin/emp/${row.original.id}`}>
+            {row.original.name}
+          </Link>
+        );
+      },
+    },
+    {
+      header: "Email",
+      accessorKey: "email",
+    },
+    {
+      header: "Phone",
+      accessorKey: "phone",
+    },
+    {
+      header: ({ column }) => {
+        return (
+          <span
+            className="flex items-center cursor-pointer gap-1"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            DOJ
+            <LuArrowDownUp className=" h-3 w-3 " />
+          </span>
+        );
+      },
+      accessorKey: "doj",
+      cell: ({ row }) => {
+        if (row.original.doj) {
+          return format(row.original.doj, "dd-MM-yyyy");
+        } else {
+          return "-";
+        }
+      },
+    },
+    {
+      header: ({ column }) => {
+        return (
+          <span
+            className="flex items-center cursor-pointer gap-1"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            DOR
+            <LuArrowDownUp className=" h-3 w-3 " />
+          </span>
+        );
+      },
+      accessorKey: "dor",
+      cell: ({ row }) => {
+        if (row.original.dor) {
+          return format(row.original.dor, "dd-MM-yyyy");
+        } else {
+          return "-";
+        }
+      },
+    },
+    {
+      header: "Last Updated",
+      accessorKey: "updatedAt",
+      cell: ({ row }) => {
+        return format(row.original.updatedAt, "dd-MM-yyyy");
+      },
+    },
+    {
+      header: "Action",
+      cell: ({ row }) => {
+        return (
+          <div
+            className={`flex items-center gap-3 justify-center ${
+              row.original.dor ? "hidden" : "flex"
+            }`}
+          >
+            <Dialog>
+              <DialogTrigger asChild>
+                <Icon
+                  icon="mage:edit"
+                  fontSize={30}
+                  className=" cursor-pointer"
+                  onClick={() => {
+                    setName(row.original.name);
+                    setPhone(row.original.phone);
+                    setDob(row.original.dob ? row.original.dob : "");
+                  }}
+                />
+              </DialogTrigger>
+
+              <DialogContent className="bg-white text-black max-sm:w-11/12">
+                <DialogHeader>
+                  <DialogTitle>Update Employee</DialogTitle>
+                  <DialogDescription className="hidden">
+                    Edit Form
+                  </DialogDescription>
+                </DialogHeader>
+
+                <form
+                  onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+                    e.preventDefault();
+                    handleSubmit(row.original.id);
+                  }}
+                >
+                  <div>
+                    <Label>Name</Label>
+                    <Input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Email</Label>
+                    <Input
+                      type="email"
+                      readOnly
+                      disabled
+                      defaultValue={row.original.email}
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Phone</Label>
+                    <Input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
+                  </div>
+
+                  {!row.original.dob && (
+                    <div>
+                      <Label>DOB</Label>
+                      <Input
+                        type="date"
+                        value={dob}
+                        onChange={(e) => setDob(e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  {row.original.dob && (
+                    <div>
+                      <Label>DOB</Label>
+                      <Input
+                        type="date "
+                        defaultValue={
+                          row.original.dob
+                            ? format(row.original.dob, "dd-MM-yyyy")
+                            : ""
+                        }
+                        readOnly
+                        disabled
+                      />
+                    </div>
+                  )}
+
+                  <DialogFooter className="pt-3">
+                    <Button
+                      type="submit"
+                      className="bg-[#6343d8] hover:bg-[#593cc1]"
+                    >
+                      Update
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Icon
+                  icon="ic:baseline-delete-forever"
+                  fontSize={30}
+                  className="cursor-pointer"
+                />
+              </DialogTrigger>
+              <DialogContent className="bg-white text-black max-sm:w-11/12 shadow shadow-[#754ffe] border border-[#007bff]">
+                <DialogHeader>
+                  <DialogTitle>
+                    Do you want delete {row.original.name}?
+                  </DialogTitle>
+                  <DialogDescription>Click yes to delete</DialogDescription>
+                </DialogHeader>
+                <div className="flex gap-5">
+                  <DialogClose asChild>
+                    <Button
+                      className="bg-[#754ffe] hover:bg-[#6f42c1]"
+                      onClick={() => {
+                        startLoading();
+                        delUser(row.original.id);
+                        stopLoading();
+                      }}
+                      disabled={loading}
+                    >
+                      {loading && (
+                        <span className="size-5 border-4 border-gray-500 border-t-white animate-spin me-2 rounded-full"></span>
+                      )}
+                      Yes
+                    </Button>
+                  </DialogClose>
+                  <DialogClose asChild>
+                    <Button className="bg-red-700">Cancel</Button>
+                  </DialogClose>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        );
+      },
+    },
+  ];
 
   useEffect(() => {
     fetchUsers();
-    startup();
-    if (!search.length) {
-      setSearchUsers(users);
-    }
   }, []);
 
   return (
@@ -105,124 +343,14 @@ const AdminEmployeeList = () => {
           <h2 className="text-lg font-semibold ps-2 ">
             Employees List ({users ? users.length : 0}){" "}
           </h2>
-          <div className="w-80 px-5 flex items-end">
-            <Input
-              className="border-2 outline-2 border-[#637085]  focus-visible:ring-0"
-              placeholder="Search Employee Name / Email / Phone"
-              value={search}
-              onChange={(e) => {
-                if (!e.target.value.length) {
-                  setSearchUsers(users);
-                }
-                setSearch(e.target.value);
-                setSearchUsers(
-                  users.filter(
-                    (user) =>
-                      user.name
-                        .toLowerCase()
-                        .includes(e.target.value.toLowerCase()) ||
-                      user.email
-                        .toLowerCase()
-                        .includes(e.target.value.toLowerCase()) ||
-                      user.phone.includes(e.target.value)
-                  )
-                );
-              }}
-            />
-          </div>
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-[#f1f5f9]">
-              <TableHead className="font-bold text-black">S.No</TableHead>
-              <TableHead className="font-bold text-black">
-                Employee Email
-              </TableHead>
-              <TableHead className="font-bold text-black">
-                Employee Phone
-              </TableHead>
-              <TableHead className="font-bold text-black">
-                Employee Name
-              </TableHead>
-              <TableHead className="text-black text-center font-bold">
-                Action
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-
-          <TableBody className="text-[#637085]">
-            {searchUsers?.length ? (
-              searchUsers.map((user: User, index: number) => {
-                return (
-                  <TableRow key={user.id}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell className="text-black">{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.phone}</TableCell>
-                    <TableCell className="flex items-center gap-3 justify-center">
-                      {/* Employee Editing Form */}
-
-                      <UserUpdateForm
-                        user={user}
-                        admin={true}
-                        setSearchUsers={setSearchUsers}
-                      />
-
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Icon
-                            icon="ic:baseline-delete-forever"
-                            fontSize={30}
-                            className="cursor-pointer"
-                          />
-                        </DialogTrigger>
-                        <DialogContent className="bg-white text-black max-sm:w-11/12 shadow shadow-[#754ffe] border border-[#007bff]">
-                          <DialogHeader>
-                            <DialogTitle>
-                              Do you want delete {user.name}?
-                            </DialogTitle>
-                            <DialogDescription>
-                              Click yes to delete
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="flex gap-5">
-                            <DialogClose asChild>
-                              <Button
-                                className="bg-[#754ffe] hover:bg-[#6f42c1]"
-                                onClick={() => {
-                                  startLoading();
-                                  delUser(user.id);
-                                  const remainsUsers = users.filter(
-                                    (val) => val.id !== user.id
-                                  );
-                                  setSearchUsers(remainsUsers);
-                                  stopLoading();
-                                }}
-                                disabled={loading}
-                              >
-                                {loading && (
-                                  <span className="size-5 border-4 border-gray-500 border-t-white animate-spin me-2 rounded-full"></span>
-                                )}
-                                Yes
-                              </Button>
-                            </DialogClose>
-                            <DialogClose asChild>
-                              <Button className="bg-red-700">Cancel</Button>
-                            </DialogClose>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            ) : (
-              <TableRow>
-                <TableCell>No Data</TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+        <CustomTable
+          columns={columns}
+          data={users}
+          placeholder="Filter by name"
+          searchColumn="name"
+          hideSearch={false}
+        />
       </Card>
     </section>
   );

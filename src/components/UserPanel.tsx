@@ -22,7 +22,8 @@ import { useUserStore } from "@/store/userStore";
 
 import { useLeaveBalanceStore } from "@/store/leaveBalanceStore";
 
-import { User } from "@/utils/objectTypes";
+import { LeaveBalance, User } from "@/utils/objectTypes";
+
 import { Card } from "./ui/card";
 
 Chart.register(BarController, BarElement, CategoryScale, LinearScale);
@@ -52,8 +53,11 @@ const UserPanel = ({ id }: { id: string }) => {
     paidLeaves: 0,
   });
 
+  const [leaves, setLeaves] = useState<LeaveBalance[]>();
+
   const getLeaveBalance = async () => {
     const res = await getUserBalanceLeave(id);
+    setLeaves(res);
     let totalLeave: number = 0;
     let balanceLeave: number = 0;
     let sickLeave: number = 0;
@@ -176,29 +180,20 @@ const UserPanel = ({ id }: { id: string }) => {
             <p className="text-sm text-[#637085]">Days</p>
           </div>
 
-          <div className="p-4 bg-white shadow-md rounded-lg text-center">
-            <h3 className="text-lg font-semibold text-[#637085]">
-              Casual Leaves
-            </h3>
-            <p className="text-2xl font-bold">{leaveBalace.casualLeaves}</p>
-            <p className="text-sm text-[#637085]">Days</p>
-          </div>
-
-          <div className="p-4 bg-white shadow-md rounded-lg text-center">
-            <h3 className="text-lg font-semibold text-[#637085]">
-              Sick Leaves
-            </h3>
-            <p className="text-2xl font-bold">{leaveBalace.sickLeaves}</p>
-            <p className="text-sm text-[#637085]">Days</p>
-          </div>
-
-          <div className="p-4 bg-white shadow-md rounded-lg text-center">
-            <h3 className="text-lg font-semibold text-[#637085]">
-              Paid Leaves
-            </h3>
-            <p className="text-2xl font-bold">{leaveBalace.paidLeaves}</p>
-            <p className="text-sm text-[#637085]">Days</p>
-          </div>
+          {leaves?.map((val) => {
+            return (
+              <div
+                className="p-4 bg-white shadow-md rounded-lg text-center"
+                key={val.id}
+              >
+                <h3 className="text-lg font-semibold text-[#637085]">
+                  {val.leaveType.name}
+                </h3>
+                <p className="text-2xl font-bold">{val.remaining}</p>
+                <p className="text-sm text-[#637085]">Days</p>
+              </div>
+            );
+          })}
         </div>
 
         {/* Section 2: Bar Chart & Holiday Calender */}

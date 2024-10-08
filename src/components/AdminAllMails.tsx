@@ -20,7 +20,7 @@ import { CustomTable } from "@/sub-components/CustomTable";
 
 import { LuArrowDownUp } from "react-icons/lu";
 
-const ResponsedMails = () => {
+const AdminAllMails = () => {
   const { mails, fetchMails } = useLeaveApplyStore();
 
   const { users, fetchUsers } = useUserStore();
@@ -126,11 +126,24 @@ const ResponsedMails = () => {
       header: "Total Days",
       accessorKey: "totalDays",
     },
+
     {
       header: "Status",
       accessorKey: "status",
       cell: ({ row }) => {
-        return <span className="text-lime-500">{row.original.status}</span>;
+        return (
+          <span
+            className={`${
+              row.original.status === "APPROVED"
+                ? "text-lime-500"
+                : row.original.status === "REQUESTED"
+                ? "text-yellow-500"
+                : "text-red-500"
+            }`}
+          >
+            {row.original.status}
+          </span>
+        );
       },
     },
   ];
@@ -141,18 +154,16 @@ const ResponsedMails = () => {
     fetchLeaves();
   }, []);
 
-  const oldMails = mails.filter((val) => val.status === "APPROVED");
-
   return (
     <section className="w-full ">
       <Card className="w-full mt-5 pt-2 max-sm:px-1  relative px-4 shadow ">
         <h2 className="text-lg font-semibold ps-2 pb-2 pt-2">
-          Approved Mails ({oldMails.length}){" "}
+          All Mails ({mails.length}){" "}
         </h2>
 
         <CustomTable
           columns={columns}
-          data={oldMails}
+          data={mails}
           placeholder="Filter by Name..."
           searchColumn="user"
           hideSearch={true}
@@ -162,4 +173,4 @@ const ResponsedMails = () => {
   );
 };
 
-export default ResponsedMails;
+export default AdminAllMails;

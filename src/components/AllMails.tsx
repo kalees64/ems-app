@@ -5,16 +5,8 @@ import React, { useEffect, useState } from "react";
 import { Card } from "./ui/card";
 
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "./ui/table";
-
-import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -43,13 +35,13 @@ import { useLeaveBalanceStore } from "@/store/leaveBalanceStore";
 
 import { toast } from "sonner";
 
-const AllMails = ({
-  mailState,
-  setMailState,
-}: {
-  mailState: boolean;
-  setMailState: (data: boolean) => void;
-}) => {
+import { ColumnDef } from "@tanstack/react-table";
+
+import { LuArrowDownUp } from "react-icons/lu";
+
+import { CustomTable } from "@/sub-components/CustomTable";
+
+const AllMails = () => {
   const { mails, fetchMails, rejectLeave, approveMail } = useLeaveApplyStore();
 
   const { users, fetchUsers } = useUserStore();
@@ -112,6 +104,241 @@ const AllMails = ({
     (val) => val.status === "REQUESTED" || val.status === "ON_HOLD"
   );
 
+  const columns: ColumnDef<LeaveMail>[] = [
+    {
+      header: "S.No",
+      accessorFn: (_, index) => {
+        return index + 1;
+      },
+    },
+    {
+      header: ({ column }) => {
+        return (
+          <span
+            className="flex items-center cursor-pointer gap-1"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Employee Name
+            <LuArrowDownUp className=" h-3 w-3 " />
+          </span>
+        );
+      },
+      accessorKey: "user",
+      cell: ({ row }) => {
+        const user = users.find((val) => val.id === row.original.user);
+        return user?.name;
+      },
+    },
+    {
+      header: ({ column }) => {
+        return (
+          <span
+            className="flex items-center cursor-pointer gap-1"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Start Date
+            <LuArrowDownUp className=" h-3 w-3 " />
+          </span>
+        );
+      },
+      accessorKey: "startDate",
+      cell: ({ row }) => {
+        return format(row.original.startDate, "dd-MM-yyyy");
+      },
+    },
+    {
+      header: "End Date",
+      accessorKey: "endDate",
+      cell: ({ row }) => {
+        return format(row.original.endDate, "dd-MM-yyyy");
+      },
+    },
+    {
+      header: ({ column }) => {
+        return (
+          <span
+            className="flex items-center cursor-pointer gap-1"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Request Date
+            <LuArrowDownUp className=" h-3 w-3 " />
+          </span>
+        );
+      },
+      accessorKey: "appliedOn",
+      cell: ({ row }) => {
+        if (row.original.appliedOn) {
+          return format(row.original.appliedOn, "dd-MM-yyyy");
+        } else {
+          return "-";
+        }
+      },
+    },
+
+    {
+      header: "Reason",
+      accessorKey: "reason",
+    },
+    {
+      header: "Leave Type",
+      accessorKey: "leaveType",
+      cell: ({ row }) => {
+        const leaveType = leaves.find(
+          (val) => val.id === row.original.leaveType
+        );
+        return leaveType?.name;
+      },
+    },
+    {
+      header: "Total Days",
+      accessorKey: "totalDays",
+    },
+
+    {
+      header: "Status",
+      accessorKey: "status",
+      cell: ({ row }) => {
+        return <span className="text-yellow-500">{row.original.status}</span>;
+      },
+    },
+    {
+      header: "Action",
+      cell: ({ row }) => {
+        const user = users.find((val) => val.id === row.original.user);
+        const leaveType = leaves.find(
+          (val) => val.id === row.original.leaveType
+        );
+        return (
+          <div className="flex justify-center items-center gap-4">
+            <Dialog>
+              <DialogTrigger>
+                <Icon
+                  icon="duo-icons:approved"
+                  fontSize={30}
+                  className="cursor-pointer"
+                />
+              </DialogTrigger>
+              <DialogContent className="bg-white text-black max-sm:w-11/12 shadow shadow-[#754ffe] border border-[#007bff]">
+                <DialogHeader>
+                  <h1>Email Approval Form</h1>
+                </DialogHeader>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleApprove(
+                      user ? user.id : "",
+                      leaveType ? leaveType.id : "",
+                      row.original.totalDays,
+                      row.original.id
+                    );
+                  }}
+                >
+                  <div>
+                    <Label className="font-bold">Employee Name</Label>
+                    <h1>{user?.name}</h1>
+                  </div>
+                  <div>
+                    <Label className="font-bold">Start Date</Label>
+                    <h1>{format(row.original.startDate, "dd-MM-yyyy")}</h1>
+                  </div>
+                  <div>
+                    <Label className="font-bold">End Date</Label>
+                    <h1>{format(row.original.endDate, "dd-MM-yyyy")}</h1>
+                  </div>
+                  <div>
+                    <Label className="font-bold">Applied Date</Label>
+                    <h1>
+                      {row.original.appliedOn
+                        ? format(row.original.appliedOn, "dd-MM-yyyy")
+                        : "-"}
+                    </h1>
+                  </div>
+                  <div>
+                    <Label className="font-bold">Leave Reason</Label>
+                    <h1>{row.original.reason}</h1>
+                  </div>
+                  <div>
+                    <Label className="font-bold">Leave Days</Label>
+                    <h1>{row.original.totalDays}</h1>
+                  </div>
+                  <DialogFooter className="pt-3">
+                    <DialogClose asChild>
+                      <Button
+                        type="submit"
+                        className="bg-[#754ffe] hover:bg-[#6f42c1]"
+                      >
+                        Approve
+                      </Button>
+                    </DialogClose>
+                    <DialogClose asChild>
+                      <Button>Close</Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog>
+              <DialogTrigger>
+                <Icon
+                  icon="rivet-icons:close-circle"
+                  fontSize={25}
+                  className="cursor-pointer"
+                />
+              </DialogTrigger>
+              <DialogContent className="bg-white text-black max-sm:w-11/12 shadow shadow-[#754ffe] border border-[#007bff]">
+                <DialogHeader>
+                  <h1>Email Rejection Form</h1>
+                </DialogHeader>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleReject(row.original.id);
+                  }}
+                >
+                  <div>
+                    <Label className="font-bold">Employee Name</Label>
+                    <h1>{user?.name}</h1>
+                  </div>
+                  <div>
+                    <Label className="font-bold">Leave Reason</Label>
+                    <h1>{row.original.reason}</h1>
+                  </div>
+                  <div>
+                    <Label className="font-bold">Leave Days</Label>
+                    <h1>{row.original.totalDays}</h1>
+                  </div>
+                  <div>
+                    <Label className="font-bold">Reason For Rejection</Label>
+                    <Input
+                      placeholder="Reason..."
+                      autoFocus
+                      type="text"
+                      value={reason}
+                      onChange={(e) => {
+                        setReason(e.target.value);
+                        setError("");
+                      }}
+                    />
+                    {error && <p className="text-red-500 text-sm">{error}</p>}
+                  </div>
+                  <DialogFooter className="pt-3">
+                    <Button
+                      type="submit"
+                      className="bg-[#754ffe] hover:bg-[#6f42c1]"
+                    >
+                      Send
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+        );
+      },
+    },
+  ];
+
   useEffect(() => {
     fetchMails();
     fetchUsers();
@@ -124,165 +351,18 @@ const AllMails = ({
 
   return (
     <section className="w-full ">
-      <div className="w-full flex gap-5 items-center mb-4">
-        {/* <h2 className="text-lg font-semibold ">All Mails</h2> */}
-        <p
-          className="font-bold cursor-pointer"
-          onClick={() => {
-            setMailState(!mailState);
-          }}
-        >
-          New Mails
-        </p>
-        <p
-          className="cursor-pointer"
-          onClick={() => {
-            setMailState(!mailState);
-          }}
-        >
-          Responsed Mails
-        </p>
-      </div>
-
       <Card className="w-full mt-5 pt-2 max-sm:px-1  relative px-4 shadow ">
         <h2 className="text-lg font-semibold ps-2 pb-2 pt-2">
           New Mails ({newMails.length}){" "}
         </h2>
 
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-[#f1f5f9]">
-              <TableHead className="font-bold text-black">S.No</TableHead>
-              <TableHead className="font-bold text-black">
-                Employee Name
-              </TableHead>
-              <TableHead className="font-bold text-black">Start Date</TableHead>
-              <TableHead className="font-bold text-black">End Date</TableHead>
-              <TableHead className="font-bold text-black">
-                Request Date
-              </TableHead>
-              <TableHead className="font-bold text-black">Reason</TableHead>
-              <TableHead className="font-bold text-black">Leave Type</TableHead>
-              <TableHead className="font-bold text-black">Total Days</TableHead>
-              <TableHead className="text-black text-center font-bold">
-                Action
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-
-          <TableBody className="text-[#637085]">
-            {newMails.length ? (
-              newMails.reverse().map((mail: LeaveMail, index: number) => {
-                const user = users.find((val) => val.id === mail.user);
-                const leaveType = leaves.find(
-                  (val) => val.id === mail.leaveType
-                );
-                return (
-                  <TableRow key={mail.id}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell className="text-black">{user?.name}</TableCell>
-                    <TableCell>
-                      {" "}
-                      {format(mail.startDate, "dd-MM-yyyy")}
-                    </TableCell>
-                    <TableCell>{format(mail.endDate, "dd-MM-yyyy")}</TableCell>
-                    <TableCell
-                      className={`${!mail.appliedOn ? "text-center" : ""}`}
-                    >
-                      {mail.appliedOn
-                        ? format(mail.appliedOn, "dd-MM-yyyy")
-                        : "-"}
-                    </TableCell>
-                    <TableCell>{mail.reason}</TableCell>
-                    <TableCell>{leaveType?.name}</TableCell>
-                    <TableCell className="text-black ">
-                      {mail.totalDays}
-                    </TableCell>
-                    <TableCell className="flex justify-center items-center gap-4">
-                      <Icon
-                        icon="duo-icons:approved"
-                        fontSize={30}
-                        className="cursor-pointer"
-                        onClick={() => {
-                          handleApprove(
-                            user ? user.id : "",
-                            leaveType ? leaveType.id : "",
-                            mail.totalDays,
-                            mail.id
-                          );
-                        }}
-                      />
-
-                      <Dialog>
-                        <DialogTrigger>
-                          <Icon
-                            icon="rivet-icons:close-circle"
-                            fontSize={25}
-                            className="cursor-pointer"
-                          />
-                        </DialogTrigger>
-                        <DialogContent className="bg-white text-black max-sm:w-11/12 shadow shadow-[#754ffe] border border-[#007bff]">
-                          <DialogHeader>
-                            <h1>Email Rejection Form</h1>
-                          </DialogHeader>
-                          <form
-                            onSubmit={(e) => {
-                              e.preventDefault();
-                              handleReject(mail.id);
-                            }}
-                          >
-                            <div>
-                              <Label className="font-bold">Employee Name</Label>
-                              <h1>{user?.name}</h1>
-                            </div>
-                            <div>
-                              <Label className="font-bold">Leave Reason</Label>
-                              <h1>{mail.reason}</h1>
-                            </div>
-                            <div>
-                              <Label className="font-bold">Leave Days</Label>
-                              <h1>{mail.totalDays}</h1>
-                            </div>
-                            <div>
-                              <Label className="font-bold">
-                                Reason For Rejection
-                              </Label>
-                              <Input
-                                placeholder="Reason..."
-                                autoFocus
-                                type="text"
-                                value={reason}
-                                onChange={(e) => {
-                                  setReason(e.target.value);
-                                  setError("");
-                                }}
-                              />
-                              {error && (
-                                <p className="text-red-500 text-sm">{error}</p>
-                              )}
-                            </div>
-                            <DialogFooter className="pt-3">
-                              <Button
-                                type="submit"
-                                className="bg-[#754ffe] hover:bg-[#6f42c1]"
-                              >
-                                Send
-                              </Button>
-                            </DialogFooter>
-                          </form>
-                        </DialogContent>
-                      </Dialog>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            ) : (
-              <TableRow>
-                <TableCell>No Data</TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+        <CustomTable
+          columns={columns}
+          data={newMails}
+          placeholder="Filter by Name..."
+          searchColumn="user"
+          hideSearch={true}
+        />
       </Card>
     </section>
   );

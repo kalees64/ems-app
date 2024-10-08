@@ -3,6 +3,7 @@
 import Navbar from "@/components/Navbar";
 
 import Sidebar from "@/components/Sidebar";
+
 import { Card } from "@/components/ui/card";
 
 import { useUserStore } from "@/store/userStore";
@@ -28,10 +29,12 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     const toMonth = month1.length < 2 ? "0" + month1 : month1;
     const findUser = all.filter((user: User) => {
       try {
-        const userMonth = user.dob.slice(5, 7);
-        const userDay = user.dob.slice(8, 10);
-        if (userMonth == toMonth && userDay == toDay) {
-          return user;
+        if (user.dob) {
+          const userMonth = user.dob.slice(5, 7);
+          const userDay = user.dob.slice(8, 10);
+          if (userMonth == toMonth && userDay == toDay) {
+            return user;
+          }
         }
       } catch (error) {
         console.log(error);

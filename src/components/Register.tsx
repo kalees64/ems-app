@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 
 import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
 
@@ -28,12 +28,28 @@ import { useRouter } from "next/navigation";
 
 import { useLoadStore } from "@/store/authStore";
 
+import { format } from "date-fns";
+
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+
 const Register = ({ admin }: { admin: boolean }) => {
   const { createUser } = useUserStore();
 
   const router = useRouter();
 
   const { loading, startLoading, stopLoading } = useLoadStore();
+
+  const [gender, setGender] = useState<string>();
+
+  const [error, setError] = useState<string>();
 
   const form = useForm({
     resolver: zodResolver(registerSchema),
@@ -46,9 +62,17 @@ const Register = ({ admin }: { admin: boolean }) => {
   });
 
   const formSubmit: SubmitHandler<T_registerData> = async (data) => {
+    if (!gender) {
+      return setError("Please select gender");
+    }
+
+    const today = new Date();
+    const doj = format(today, "yyyy-MM-dd");
     const newData = {
       ...data,
       phone: "+91-" + data.phone,
+      doj,
+      gender,
     };
     startLoading();
     try {
@@ -166,6 +190,35 @@ const Register = ({ admin }: { admin: boolean }) => {
                 </FormItem>
               )}
             />
+
+            <div>
+              <Label className="text-[#637085]">
+                Gender<span className="text-red-500">&nbsp;*</span>
+              </Label>
+              <Select
+                value={gender}
+                onValueChange={(value) => {
+                  setGender(value);
+                  setError("");
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder="Gender"
+                    className="text-[#637085]"
+                  />
+                </SelectTrigger>
+
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel className="text-[#637085]">Gender</SelectLabel>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              {error && <p className="text-sm text-red-500">{error}</p>}
+            </div>
 
             <div className="pt-3 w-full">
               <Button

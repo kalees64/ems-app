@@ -27,6 +27,8 @@ export interface User {
   email: string;
   doj: string;
   dob: string;
+  dor: string;
+  gender: string;
   phone: string;
   alternatePhone: string;
   password: string;
@@ -56,6 +58,7 @@ export interface UpdateUser {
   doj?: string;
   dob?: string;
   phone?: string;
+  gender?: string;
   alternatePhone?: string;
   password?: string;
   roles?: string[];
@@ -104,6 +107,7 @@ export interface LeaveData {
   status: string;
   leaveType: string;
   comments?: string;
+  assignedTo?: string;
 }
 
 // Leave Apply form errors  type define
