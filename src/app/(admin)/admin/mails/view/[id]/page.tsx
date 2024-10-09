@@ -297,6 +297,15 @@ const RequestedPendingMailViewPage = ({
               >
                 Back
               </Button>
+
+              <Button
+                className="bg-gray-400 hover:bg-gray-500"
+                onClick={() => {
+                  router.push(`/admin/emp/${user?.id}`);
+                }}
+              >
+                Leave History
+              </Button>
             </TableCell>
           </TableRow>
         </TableBody>

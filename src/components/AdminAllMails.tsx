@@ -109,6 +109,20 @@ const AdminAllMails = () => {
       },
     },
     {
+      header: "Half Day",
+      accessorKey: "halfDay",
+      cell: ({ row }) => {
+        return row.original.halfDay ? "Yes" : "No";
+      },
+    },
+    {
+      header: "Half Day Session",
+      accessorKey: "halfDaySession",
+      cell: ({ row }) => {
+        return row.original.halfDaySession ? row.original.halfDaySession : "-";
+      },
+    },
+    {
       header: "Reason",
       accessorKey: "reason",
     },

@@ -70,6 +70,10 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
 
   const [halfDay, setHalfDay] = useState<boolean>(false);
 
+  const [halfDaySession, setHalfDaySession] = useState<string>();
+
+  const [sessionError, setSessionError] = useState<string>();
+
   const [reason, setReason] = useState<string>();
 
   const [leaveBalances, setLeaveBalances] = useState<LeaveBalance[]>();
@@ -91,6 +95,10 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
         endDate: "Please select end date",
         reason: "Please enter the reason",
       });
+    }
+
+    if (halfDay && !halfDaySession) {
+      return setSessionError("Please select the session");
     }
 
     if (!leaveType) {
@@ -133,7 +141,9 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
       if (
         sd === startDate &&
         ed === endDate &&
-        (mail.status === "REQUESTED" || mail.status === "APPROVED")
+        (mail.status === "REQUESTED" || mail.status === "APPROVED") &&
+        halfDay &&
+        mail.halfDaySession === halfDaySession
       ) {
         return mail;
       }
@@ -141,6 +151,14 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
 
     if (userMail) {
       stopLoading();
+      if (userMail.halfDay) {
+        return setTimeout(() => {
+          toast.error(
+            "Tou have already applied half day session - " +
+              userMail.halfDaySession
+          );
+        }, 100);
+      }
       return setTimeout(() => {
         toast.error("This leave already applied");
       }, 100);
@@ -155,6 +173,7 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
       reason,
       user: id,
       status: "REQUESTED",
+      halfDaySession: halfDaySession ? halfDaySession : null,
     };
 
     localStorage.setItem("formData", JSON.stringify(data));
@@ -185,13 +204,13 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
   }, []);
 
   return (
-    <div className="flex max-sm:w-96 max-sm:flex-col gap-5 ">
+    <div className=" w-full flex  items-start  justify-start gap-3">
       <form
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
         }}
-        className="w-96 "
+        className=" flex-grow w-full"
       >
         <div>
           <Label>
@@ -375,7 +394,7 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
 
               <Input
                 type="checkbox"
-                className="size-14"
+                className="size-3"
                 checked={halfDay}
                 onChange={(e) => {
                   setHalfDay(e.target.checked);
@@ -389,6 +408,38 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
             </div>
           )}
         </div>
+
+        {halfDay && (
+          <div>
+            <Label>
+              Leave Type<span className="text-red-500">&nbsp;*</span>
+            </Label>
+
+            <Select
+              value={halfDaySession}
+              onValueChange={(value) => {
+                setHalfDaySession(value);
+                setSessionError("");
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Half Day Session" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Half Day Session</SelectLabel>
+                  <SelectItem value="MORNING">MORNING</SelectItem>
+                  <SelectItem value="AFTERNOON">AFTERNOON</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+
+            {halfDay && !halfDaySession && (
+              <p className="text-red-500 text-sm">{sessionError}</p>
+            )}
+          </div>
+        )}
 
         <div>
           <Label>
@@ -433,9 +484,8 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
           </Button>
         </div>
       </form>
-      <div className="w-96 bg-red-500 h-full ">
-        <LeaveFormPageLeaves id={id} />
-      </div>
+
+      <LeaveFormPageLeaves id={id} />
     </div>
   );
 };

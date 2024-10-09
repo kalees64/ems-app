@@ -107,7 +107,7 @@ const Calendar: React.FC<CalendarProps> = ({
                   : isSameDay(day, selectedDate ? selectedDate : "")
                   ? "bg-gray-500 text-white"
                   : isToday
-                  ? "bg-gray-500 text-white "
+                  ? "bg-blue-500 text-white "
                   : "hover:bg-blue-100"
               }`}
             >

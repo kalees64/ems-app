@@ -108,6 +108,7 @@ export interface LeaveData {
   leaveType: string;
   comments?: string;
   assignedTo?: string;
+  halfDaySession?: "MORNING" | "AFTERNOON";
 }
 
 // Leave Apply form errors  type define

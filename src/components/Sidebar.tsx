@@ -24,7 +24,7 @@ const Sidebar = ({
       <nav className="flex flex-col space-y-4 pt-2 max-lg:pt-0 max-lg:pb-4 font-semibold">
         <div
           onClick={() => {
-            router.push("/admin");
+            router.push("/admin/employees");
             setSide?.(!side);
           }}
           className="text-[#637085] hover:text-[#94A3B8] p-2 rounded flex gap-4 items-center cursor-pointer"
@@ -64,7 +64,7 @@ const Sidebar = ({
           }}
           className="text-[#637085] hover:text-[#94A3B8] p-2 rounded flex gap-4 items-center cursor-pointer"
         >
-          <Icon icon="ic:sharp-history" fontSize={25} />
+          <Icon icon="iconoir:reports" fontSize={25} />
           <p>Leave History</p>
         </div>
 

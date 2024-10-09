@@ -14,7 +14,6 @@ const LeaveFormPageLeaves = ({ id }: { id: string }) => {
   const start = async () => {
     const res = await getUserBalanceLeave(id);
     setBalanceLeave(res);
-    console.log(res);
   };
 
   useEffect(() => {
@@ -22,7 +21,7 @@ const LeaveFormPageLeaves = ({ id }: { id: string }) => {
   }, []);
 
   return (
-    <section className="bg-white">
+    <section className="w-5/12 flex-shrink">
       <ul>
         {balanceLeave?.map((val) => {
           return (

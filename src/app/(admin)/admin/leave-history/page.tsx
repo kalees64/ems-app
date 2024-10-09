@@ -154,9 +154,11 @@ const AdminPageLeavesHistory = () => {
           data={userMails}
           placeholder="Filter by reason"
           searchColumn="reason"
-          hideSearch={true}
+          hideSearch={false}
         />
       </Card>
+
+      <p>Note: Only approved leaves data is displayed.</p>
     </section>
   );
 };

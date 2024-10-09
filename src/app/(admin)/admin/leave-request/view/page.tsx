@@ -100,6 +100,16 @@ const AdminLeaveRequestConfirmation = () => {
             </TableCell>
           </TableRow>
           <TableRow>
+            <TableHead className="text-black">Half Day</TableHead>
+            <TableCell>{data?.halfDay ? "Yes" : "No"}</TableCell>
+          </TableRow>
+          {data?.halfDay && (
+            <TableRow>
+              <TableHead className="text-black">Half Day Session</TableHead>
+              <TableCell>{data?.halfDaySession}</TableCell>
+            </TableRow>
+          )}
+          <TableRow>
             <TableHead className="text-black">Reason</TableHead>
             <TableCell>{data?.reason}</TableCell>
           </TableRow>
@@ -121,7 +131,6 @@ const AdminLeaveRequestConfirmation = () => {
               <Button
                 className="bg-red-400 hover:bg-red-500"
                 onClick={() => {
-                  localStorage.removeItem("formData");
                   router.back();
                 }}
               >

@@ -82,6 +82,20 @@ const UserMailStatusList = ({ id }: { id: string }) => {
       accessorKey: "reason",
     },
     {
+      header: "Half Day",
+      accessorKey: "halfDay",
+      cell: ({ row }) => {
+        return row.original.halfDay ? "Yes" : "No";
+      },
+    },
+    {
+      header: "Half Day Session",
+      accessorKey: "halfDaySession",
+      cell: ({ row }) => {
+        return row.original.halfDaySession ? row.original.halfDaySession : "-";
+      },
+    },
+    {
       header: "Leave Type",
       accessorKey: "leaveType",
       cell: ({ row }) => {

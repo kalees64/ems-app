@@ -104,7 +104,15 @@ export const getToken = async () => {
   if (res) {
     const data = await JSON.parse(res);
     const token = data.token;
-    console.log(typeof token);
     return token;
+  }
+};
+
+export const getUserIDfromToken = async () => {
+  const res = await localStorage.getItem("token");
+  if (res) {
+    const data = await JSON.parse(res);
+    const user = data.user;
+    return user.id;
   }
 };

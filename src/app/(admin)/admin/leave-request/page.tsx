@@ -71,6 +71,10 @@ const AdminLeaveApplyForm = () => {
 
   const [halfDay, setHalfDay] = useState<boolean>(false);
 
+  const [halfDaySession, setHalfDaySession] = useState<string>();
+
+  const [sessionError, setSessionError] = useState<string>();
+
   const [reason, setReason] = useState<string>();
 
   const [leaveBalances] = useState<LeaveBalance[]>();
@@ -138,7 +142,9 @@ const AdminLeaveApplyForm = () => {
       if (
         sd === startDate &&
         ed === endDate &&
-        (mail.status === "REQUESTED" || mail.status === "APPROVED")
+        (mail.status === "REQUESTED" || mail.status === "APPROVED") &&
+        halfDay &&
+        mail.halfDaySession === halfDaySession
       ) {
         return mail;
       }
@@ -146,6 +152,14 @@ const AdminLeaveApplyForm = () => {
 
     if (userMail) {
       stopLoading();
+      if (userMail.halfDay) {
+        return setTimeout(() => {
+          toast.error(
+            "Tou have already applied half day session - " +
+              userMail.halfDaySession
+          );
+        }, 100);
+      }
       return setTimeout(() => {
         toast.error("This leave already applied");
       }, 100);
@@ -428,6 +442,38 @@ const AdminLeaveApplyForm = () => {
             </div>
           )}
         </div>
+
+        {halfDay && (
+          <div>
+            <Label>
+              Leave Type<span className="text-red-500">&nbsp;*</span>
+            </Label>
+
+            <Select
+              value={halfDaySession}
+              onValueChange={(value) => {
+                setHalfDaySession(value);
+                setSessionError("");
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Half Day Session" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Half Day Session</SelectLabel>
+                  <SelectItem value="MORNING">MORNING</SelectItem>
+                  <SelectItem value="AFTERNOON">AFTERNOON</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+
+            {halfDay && !halfDaySession && (
+              <p className="text-red-500 text-sm">{sessionError}</p>
+            )}
+          </div>
+        )}
 
         <div>
           <Label>

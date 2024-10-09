@@ -90,6 +90,16 @@ const RequestFormView = () => {
             </TableCell>
           </TableRow>
           <TableRow>
+            <TableHead className="text-black">Half Day</TableHead>
+            <TableCell>{data?.halfDay ? "Yes" : "No"}</TableCell>
+          </TableRow>
+          {data?.halfDay && (
+            <TableRow>
+              <TableHead className="text-black">Half Day Session</TableHead>
+              <TableCell>{data?.halfDaySession}</TableCell>
+            </TableRow>
+          )}
+          <TableRow>
             <TableHead className="text-black">Reason</TableHead>
             <TableCell>{data?.reason}</TableCell>
           </TableRow>
