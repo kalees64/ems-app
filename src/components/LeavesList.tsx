@@ -48,8 +48,34 @@ const LeavesList = () => {
 
   const [count, setCount] = useState("");
 
+  const [error, setError] = useState({
+    name: "",
+    count: "",
+  });
+
   const handleSubmit = async (id: string) => {
     startLoading();
+
+    if (!name && !count) {
+      stopLoading();
+      return setError({
+        name: "Please enter leave name",
+        count: "Please enter leave count",
+      });
+    }
+
+    if (!name) {
+      stopLoading();
+
+      return setError({ ...error, name: "Please enter  leave name" });
+    }
+
+    if (!count) {
+      stopLoading();
+
+      return setError({ ...error, count: "Please  enter leave count" });
+    }
+
     const key = name.replace(/\s+/g, "_").toUpperCase();
     if (count) {
       updateLeave(id, { name, count, key });
@@ -75,8 +101,8 @@ const LeavesList = () => {
         </Link>
       </div>
 
-      <Card className="w-full mt-5 pt-2 max-sm:px-1  relative px-4 shadow ">
-        <h2 className="text-lg font-semibold ps-2 pb-2 pt-2">
+      <Card className="w-full mt-5 pt-2 max-sm:px-1  relative  shadow ">
+        <h2 className="text-lg font-semibold ps-3 pb-2 pt-2">
           Leaves List ({leaves?.length}){" "}
         </h2>
 
@@ -140,8 +166,14 @@ const LeavesList = () => {
                                   defaultValue={name}
                                   onChange={(e) => {
                                     setName(e.target.value);
+                                    setError({ ...error, name: "" });
                                   }}
                                 />
+                                {error.name && (
+                                  <p className="text-red-500 text-sm">
+                                    {error.name}
+                                  </p>
+                                )}
                               </div>
                               <div>
                                 <Label>Leave Count</Label>
@@ -150,8 +182,14 @@ const LeavesList = () => {
                                   defaultValue={count}
                                   onChange={(e) => {
                                     setCount(e.target.value);
+                                    setError({ ...error, count: "" });
                                   }}
                                 />
+                                {error.count && (
+                                  <p className="text-red-500 text-sm">
+                                    {error.count}
+                                  </p>
+                                )}
                               </div>
                               <div className="pt-3">
                                 <Button

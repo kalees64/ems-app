@@ -56,9 +56,9 @@ const RequestedPendingMailViewPage = ({
 
   const mail = mails.find((val) => val.id === params.id);
 
-  const user = users.find((val) => val.id === mail?.user);
+  const user = users.find((val) => val.id === mail?.user.id);
 
-  const leaveType = leaves.find((val) => val.id === mail?.leaveType);
+  const leaveType = leaves.find((val) => val.id === mail?.leaveType.id);
 
   const [reason, setReason] = useState<string>("");
 
@@ -180,8 +180,8 @@ const RequestedPendingMailViewPage = ({
                     onSubmit={(e) => {
                       e.preventDefault();
                       handleApprove(
-                        mail ? mail.user : "",
-                        mail ? mail.leaveType : "",
+                        mail ? mail.user.id : "",
+                        mail?.leaveType.id ? mail.leaveType.id : "",
                         mail ? mail.totalDays : 0,
                         mail ? mail.id : ""
                       );

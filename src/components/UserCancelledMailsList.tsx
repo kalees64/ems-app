@@ -24,7 +24,7 @@ const UserCancelledMailsList = ({ id }: { id: string }) => {
   const { leaves, fetchLeaves } = useLeavesStore();
 
   const userMails = mails.filter(
-    (mail) => mail.user === id && mail.status === "CANCELLED"
+    (mail) => mail.user.id === id && mail.status === "CANCELLED"
   );
 
   const colums: ColumnDef<LeaveMail>[] = [
@@ -102,7 +102,7 @@ const UserCancelledMailsList = ({ id }: { id: string }) => {
       accessorKey: "leaveType",
       cell: ({ row }) => {
         const userLeave = leaves.find(
-          (val) => val.id === row.original.leaveType
+          (val) => val.id === row.original.leaveType.id
         );
         return userLeave?.name;
       },

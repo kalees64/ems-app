@@ -24,7 +24,7 @@ const UserRejectedMailsList = ({ id }: { id: string }) => {
   const { leaves, fetchLeaves } = useLeavesStore();
 
   const userMails = mails.filter(
-    (mail) => mail.user === id && mail.status === "REJECTED"
+    (mail) => mail.user.id === id && mail.status === "REJECTED"
   );
 
   const colums: ColumnDef<LeaveMail>[] = [
@@ -102,7 +102,7 @@ const UserRejectedMailsList = ({ id }: { id: string }) => {
       accessorKey: "leaveType",
       cell: ({ row }) => {
         const userLeave = leaves.find(
-          (val) => val.id === row.original.leaveType
+          (val) => val.id === row.original.leaveType.id
         );
         return userLeave?.name;
       },

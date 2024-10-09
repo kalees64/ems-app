@@ -270,9 +270,9 @@ const AdminEmployeeList = () => {
         </Card>
       </div>
 
-      <Card className="w-full mt-5 pt-2 max-sm:px-1  relative px-4 shadow ">
+      <Card className="w-full mt-5 pt-2 max-sm:px-1  relative  shadow ">
         <div className="w-full flex justify-between items-center pt-2 pb-4">
-          <h2 className="text-lg font-semibold ps-2 ">
+          <h2 className="text-lg font-semibold ps-3 ">
             Employees List ({users ? users.length : 0}){" "}
           </h2>
         </div>

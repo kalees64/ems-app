@@ -47,7 +47,7 @@ const EmployeeProfile = ({ params }: { params: { id: string } }) => {
   const { leaves, fetchLeaves } = useLeavesStore();
 
   const userMails = mails.filter(
-    (mail) => mail.user === params.id && mail.status === "APPROVED"
+    (mail) => mail.user.id === params.id && mail.status === "APPROVED"
   );
 
   const start = async () => {
@@ -106,7 +106,7 @@ const EmployeeProfile = ({ params }: { params: { id: string } }) => {
       header: "Leave Type",
       cell: ({ row }) => {
         const leaveType = leaves.find(
-          (val) => val.id === row.original.leaveType
+          (val) => val.id === row.original.leaveType.id
         );
         return <span>{leaveType?.name}</span>;
       },

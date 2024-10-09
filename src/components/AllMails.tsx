@@ -129,12 +129,11 @@ const AllMails = () => {
           </span>
         );
       },
-      accessorKey: "user",
+      accessorKey: "user.name",
       cell: ({ row }) => {
-        const user = users.find((val) => val.id === row.original.user);
         return (
           <Link href={`/admin/mails/view/${row.original.id}`}>
-            {user?.name}
+            {row.original.user.name}
           </Link>
         );
       },
@@ -207,7 +206,7 @@ const AllMails = () => {
       accessorKey: "leaveType",
       cell: ({ row }) => {
         const leaveType = leaves.find(
-          (val) => val.id === row.original.leaveType
+          (val) => val.id === row.original.leaveType.id
         );
         return leaveType?.name;
       },
@@ -227,7 +226,7 @@ const AllMails = () => {
     {
       header: "Action",
       cell: ({ row }) => {
-        const user = users.find((val) => val.id === row.original.user);
+        const user = users.find((val) => val.id === row.original.user.id);
 
         return (
           <div className="flex justify-center items-center gap-4">
@@ -270,8 +269,8 @@ const AllMails = () => {
 
   return (
     <section className="w-full ">
-      <Card className="w-full mt-5 pt-2 max-sm:px-1  relative px-4 shadow ">
-        <h2 className="text-lg font-semibold ps-2 pb-2 pt-2">
+      <Card className="w-full mt-5 pt-2 max-sm:px-1  relative  shadow ">
+        <h2 className="text-lg font-semibold ps-3 pb-2 pt-2">
           New Mails ({newMails.length}){" "}
         </h2>
 
@@ -293,8 +292,8 @@ const AllMails = () => {
               onSubmit={(e) => {
                 e.preventDefault();
                 handleApprove(
-                  selectedMail ? selectedMail.user : "",
-                  selectedMail ? selectedMail.leaveType : "",
+                  selectedMail ? selectedMail.user.id : "",
+                  selectedMail?.leaveType.id ? selectedMail.leaveType.id : "",
                   selectedMail ? selectedMail.totalDays : 0,
                   selectedMail ? selectedMail.id : ""
                 );

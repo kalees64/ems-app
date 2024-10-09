@@ -8,8 +8,6 @@ import { useLeaveApplyStore } from "@/store/leaveApplyStore";
 
 import { LeaveMail } from "@/utils/objectTypes";
 
-import { useUserStore } from "@/store/userStore";
-
 import { useLeavesStore } from "@/store/leaveStore";
 
 import { format } from "date-fns";
@@ -22,8 +20,6 @@ import { LuArrowDownUp } from "react-icons/lu";
 
 const CancelledMails = () => {
   const { mails, fetchMails } = useLeaveApplyStore();
-
-  const { users, fetchUsers } = useUserStore();
 
   const { leaves, fetchLeaves } = useLeavesStore();
 
@@ -46,11 +42,7 @@ const CancelledMails = () => {
           </span>
         );
       },
-      accessorKey: "user",
-      cell: ({ row }) => {
-        const user = users.find((val) => val.id === row.original.user);
-        return user?.name;
-      },
+      accessorKey: "user.name",
     },
     {
       header: ({ column }) => {
@@ -131,7 +123,7 @@ const CancelledMails = () => {
       accessorKey: "leaveType",
       cell: ({ row }) => {
         const leaveType = leaves.find(
-          (val) => val.id === row.original.leaveType
+          (val) => val.id === row.original.leaveType.id
         );
         return leaveType?.name;
       },
@@ -155,7 +147,6 @@ const CancelledMails = () => {
 
   useEffect(() => {
     fetchMails();
-    fetchUsers();
     fetchLeaves();
   }, []);
 
@@ -163,8 +154,8 @@ const CancelledMails = () => {
 
   return (
     <section className="w-full ">
-      <Card className="w-full mt-5 pt-2 max-sm:px-1  relative px-4 shadow ">
-        <h2 className="text-lg font-semibold ps-2 pb-2 pt-2">
+      <Card className="w-full mt-5 pt-2 max-sm:px-1  relative  shadow ">
+        <h2 className="text-lg font-semibold ps-3 pb-2 pt-2">
           Cancelled Mails ({oldMails.length}){" "}
         </h2>
 

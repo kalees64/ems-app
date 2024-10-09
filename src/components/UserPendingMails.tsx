@@ -36,7 +36,7 @@ const UserPendingMails = ({ id }: { id: string }) => {
   const { leaves, fetchLeaves } = useLeavesStore();
 
   const userMails = mails.filter(
-    (mail) => mail.user === id && mail.status === "REQUESTED"
+    (mail) => mail.user.id === id && mail.status === "REQUESTED"
   );
 
   const { users, fetchUsers } = useUserStore();
@@ -142,7 +142,7 @@ const UserPendingMails = ({ id }: { id: string }) => {
       accessorKey: "leaveType",
       cell: ({ row }) => {
         const userLeave = leaves.find(
-          (val) => val.id === row.original.leaveType
+          (val) => val.id === row.original.leaveType.id
         );
         return userLeave?.name;
       },
@@ -179,7 +179,7 @@ const UserPendingMails = ({ id }: { id: string }) => {
 
         let isEnd: boolean;
 
-        const user = users.find((val) => val.id === row.original.user);
+        const user = users.find((val) => val.id === row.original.user.id);
 
         if (day) {
           isEnd = isBefore(day, today);

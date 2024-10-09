@@ -4,8 +4,6 @@ import { Card } from "@/components/ui/card";
 
 import { useLeaveApplyStore } from "@/store/leaveApplyStore";
 
-import { useLeavesStore } from "@/store/leaveStore";
-
 import { useUserStore } from "@/store/userStore";
 
 import { CustomTable } from "@/sub-components/CustomTable";
@@ -24,8 +22,6 @@ import { LuArrowDownUp } from "react-icons/lu";
 
 const AdminPageLeavesHistory = () => {
   const { mails, fetchMails } = useLeaveApplyStore();
-
-  const { leaves, fetchLeaves } = useLeavesStore();
 
   const { users, fetchUsers } = useUserStore();
 
@@ -55,22 +51,17 @@ const AdminPageLeavesHistory = () => {
         return (
           <Link
             href={`/admin/emp/${
-              users.find((user) => user.id === row.original.user)?.id
+              users.find((user) => user.id === row.original.user.id)?.id
             }`}
           >
-            {users.find((user) => user.id === row.original.user)?.name}
+            {users.find((user) => user.id === row.original.user.id)?.name}
           </Link>
         );
       },
     },
     {
       header: "Leave Type",
-      cell: ({ row }) => {
-        const leaveType = leaves.find(
-          (val) => val.id === row.original.leaveType
-        );
-        return <span>{leaveType?.name}</span>;
-      },
+      accessorKey: "leaveType.name",
     },
     {
       accessorKey: "startDate",
@@ -141,14 +132,13 @@ const AdminPageLeavesHistory = () => {
 
   useEffect(() => {
     fetchMails();
-    fetchLeaves();
     fetchUsers();
   }, []);
   return (
     <section>
       <h1 className="text-2xl font-bold pb-3">Employee Leave History</h1>
 
-      <Card className="py-2 p-1">
+      <Card className="py-2 pt-3 ">
         <CustomTable
           columns={columns}
           data={userMails}

@@ -23,7 +23,7 @@ const UserMailStatusList = ({ id }: { id: string }) => {
 
   const { leaves, fetchLeaves } = useLeavesStore();
 
-  const userMails = mails.filter((mail) => mail.user === id);
+  const userMails = mails.filter((mail) => mail.user.id === id);
 
   const colums: ColumnDef<LeaveMail>[] = [
     {
@@ -100,7 +100,7 @@ const UserMailStatusList = ({ id }: { id: string }) => {
       accessorKey: "leaveType",
       cell: ({ row }) => {
         const userLeave = leaves.find(
-          (val) => val.id === row.original.leaveType
+          (val) => val.id === row.original.leaveType.id
         );
         return userLeave?.name;
       },

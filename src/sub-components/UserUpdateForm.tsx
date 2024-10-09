@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -46,7 +45,27 @@ const UserUpdateForm = ({
 
   const [dob, setDob] = useState<string>("");
 
+  const [error, setError] = useState({
+    name: "",
+    phone: "",
+  });
+
   const handleSubmit = async () => {
+    if (!name && !phone) {
+      return setError({
+        name: "Please enter name",
+        phone: "Please enter phone",
+      });
+    }
+
+    if (!name) {
+      return setError({ ...error, name: "Please enter name" });
+    }
+
+    if (!phone) {
+      return setError({ ...error, phone: "Please enter phone" });
+    }
+
     const newUserData = {
       name,
       phone,
@@ -100,8 +119,12 @@ const UserUpdateForm = ({
             <Input
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                setError({ ...error, name: "" });
+              }}
             />
+            {error.name && <p className="text-red-500 text-sm">{error.name}</p>}
           </div>
 
           <div>
@@ -114,8 +137,14 @@ const UserUpdateForm = ({
             <Input
               type="tel"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => {
+                setPhone(e.target.value);
+                setError({ ...error, phone: "" });
+              }}
             />
+            {error.phone && (
+              <p className="text-red-500 text-sm">{error.phone}</p>
+            )}
           </div>
 
           {!user.dob && (
@@ -142,11 +171,9 @@ const UserUpdateForm = ({
           )}
 
           <DialogFooter className="pt-3">
-            <DialogClose asChild>
-              <Button type="submit" className="bg-[#6343d8] hover:bg-[#593cc1]">
-                Update
-              </Button>
-            </DialogClose>
+            <Button type="submit" className="bg-[#6343d8] hover:bg-[#593cc1]">
+              Update
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

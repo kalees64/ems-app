@@ -96,6 +96,7 @@ export interface ApplyLeave {
 
 // Leave apply data type define
 export interface LeaveData {
+  id?: string;
   startDate: string;
   endDate: string;
   appliedOn?: string;
@@ -143,8 +144,8 @@ export interface LeaveMail {
   totalDays: number;
   approvedBy: null | User;
   assignedTo: null | User;
-  user: string;
-  leaveType: string;
+  user: User;
+  leaveType: LeaveData;
   cancelledDate?: string;
 }
 

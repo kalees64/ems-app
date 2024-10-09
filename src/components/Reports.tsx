@@ -30,11 +30,11 @@ const Reports = () => {
   }, []);
 
   return (
-    <section className="bg-white rounded-xl p-4 text-black shadow ">
-      <h2 className="text-lg font-semibold mb-4">
+    <section className="bg-white rounded-xl py-4 text-black shadow ">
+      <h2 className="text-lg font-semibold mb-2 ps-3">
         Employee Reports ({users ? users.length : 0})
       </h2>
-      <div className="w-full pt-5  max-sm:px-1  relative">
+      <div className="w-full   max-sm:px-1  relative">
         <Table>
           <TableHeader>
             <TableRow className="bg-[#f1f5f9]">

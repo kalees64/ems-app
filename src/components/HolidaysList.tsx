@@ -218,9 +218,9 @@ const HolidaysList = () => {
 
   return (
     <div>
-      <section className="bg-white rounded-xl shadow  p-4 ">
-        <div className="flex items-center justify-between pb-4">
-          <h1 className="text-lg font-semibold mb-4 pe-5">
+      <section className="bg-white rounded-xl shadow  py-4 ">
+        <div className="flex items-center justify-between pb-2 px-3">
+          <h1 className="text-lg font-semibold ">
             Holidays ({holidays ? holidays.length : 0})
           </h1>
           <div>
@@ -394,14 +394,12 @@ const HolidaysList = () => {
                     />
                   </div>
 
-                  <DialogClose asChild>
-                    <Button
-                      type="submit"
-                      className="bg-[#754ffe] hover:bg-[#6f42c1]"
-                    >
-                      update
-                    </Button>
-                  </DialogClose>
+                  <Button
+                    type="submit"
+                    className="bg-[#754ffe] hover:bg-[#6f42c1]"
+                  >
+                    update
+                  </Button>
                 </form>
               )}
             </DialogHeader>
