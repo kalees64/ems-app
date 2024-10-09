@@ -14,7 +14,7 @@ import {
 
 import UserPanelSidebar from "@/components/UserPanelSidebar";
 
-import { useLoadStore } from "@/store/authStore";
+import { useAuthStore, useLoadStore } from "@/store/authStore";
 
 import { Icon } from "@iconify/react/dist/iconify.js";
 
@@ -34,6 +34,8 @@ const UserLayout = ({
   const router = useRouter();
 
   const [side, setSide] = useState<boolean>(false);
+
+  const { logout } = useAuthStore();
 
   const { loading, startLoading, stopLoading } = useLoadStore();
 
@@ -96,7 +98,7 @@ const UserLayout = ({
                     <Button
                       onClick={() => {
                         startLoading();
-                        // logout();
+                        logout();
                         localStorage.removeItem("token");
                         stopLoading();
                         router.push("/login");

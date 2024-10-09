@@ -1,16 +1,15 @@
 import { LeaveData, LeaveDataCopy, LeaveMail } from "@/utils/objectTypes";
 
-import axios from "axios";
-
 import { toast } from "sonner";
 
 import { create } from "zustand";
+import axiosAPI from "./axiosAPI";
 
 interface LeaveApplyStore {
   mails: LeaveMail[];
   fetchMails: () => void;
   applyLeave: (data: LeaveData) => void;
-  cancelLeave: (id: string) => void;
+  cancelLeave: (id: string, data: LeaveDataCopy) => void;
   approveMail: (id: string) => void;
   rejectLeave: (id: string, data: LeaveDataCopy) => void;
 }
@@ -20,9 +19,7 @@ export const useLeaveApplyStore = create<LeaveApplyStore>((set) => ({
 
   fetchMails: async () => {
     try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/leaveRequests`
-      );
+      const res = await axiosAPI.get(`/leaveRequests`);
       set({ mails: res.data.data });
     } catch (error) {
       console.log(error);
@@ -31,10 +28,7 @@ export const useLeaveApplyStore = create<LeaveApplyStore>((set) => ({
 
   applyLeave: async (data) => {
     try {
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/leaveRequests`,
-        data
-      );
+      const res = await axiosAPI.post(`/leaveRequests`, data);
       set((state) => ({ mails: [...state.mails, res.data.data] }));
       setTimeout(() => {
         toast.success("Leave Applied");
@@ -44,12 +38,9 @@ export const useLeaveApplyStore = create<LeaveApplyStore>((set) => ({
     }
   },
 
-  cancelLeave: async (id) => {
+  cancelLeave: async (id, data) => {
     try {
-      const res = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/leaveRequests/id/${id}`,
-        { status: "CANCELLED" }
-      );
+      const res = await axiosAPI.put(`/leaveRequests/id/${id}`, data);
       set((state) => ({
         mails: state.mails.map((val) => (val.id === id ? res.data.data : val)),
       }));
@@ -64,10 +55,10 @@ export const useLeaveApplyStore = create<LeaveApplyStore>((set) => ({
   approveMail: async (id) => {
     const today = new Date().toISOString();
     try {
-      const res = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/leaveRequests/id/${id}`,
-        { status: "APPROVED", approvedDate: today }
-      );
+      const res = await axiosAPI.put(`/leaveRequests/id/${id}`, {
+        status: "APPROVED",
+        approvedDate: today,
+      });
       set((state) => ({
         mails: state.mails.map((val) => (val.id === id ? res.data.data : val)),
       }));
@@ -81,10 +72,7 @@ export const useLeaveApplyStore = create<LeaveApplyStore>((set) => ({
 
   rejectLeave: async (id, data) => {
     try {
-      const res = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/leaveRequests/id/${id}`,
-        data
-      );
+      const res = await axiosAPI.put(`/leaveRequests/id/${id}`, data);
       set((state) => ({
         mails: state.mails.map((val) => (val.id === id ? res.data.data : val)),
       }));

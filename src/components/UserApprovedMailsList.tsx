@@ -14,7 +14,7 @@ import {
 
 import { useLeaveApplyStore } from "@/store/leaveApplyStore";
 
-import { LeaveMail } from "@/utils/objectTypes";
+import { LeaveMail, User } from "@/utils/objectTypes";
 
 import { format, isBefore } from "date-fns";
 
@@ -51,18 +51,22 @@ const UserApprovedMailsList = ({ id }: { id: string }) => {
 
   const [error, setError] = useState<string>("");
 
-  const { rejectLeave } = useLeaveApplyStore();
+  const [openCancel, setOpenCancel] = useState<boolean>(false);
+
+  const [selectedUser, setSelectedUser] = useState<User>();
+
+  const [selectedMail, setSelectedMail] = useState<LeaveMail>();
+
+  const { cancelLeave } = useLeaveApplyStore();
 
   const handleCancel = async (id: string) => {
     if (!reason) {
       return setError("Please enter the reason");
     }
-    const today = new Date().toISOString();
     try {
-      await rejectLeave(id, {
+      await cancelLeave(id, {
         comments: reason,
         status: "CANCELLED",
-        approvedDate: today,
       });
     } catch (error) {
       console.log(error);
@@ -173,60 +177,15 @@ const UserApprovedMailsList = ({ id }: { id: string }) => {
           isEnd = isBefore(day, today);
 
           return (
-            <Dialog>
-              <DialogTrigger>
-                <TbMailCancel
-                  size={25}
-                  className={`cursor-pointer ${isEnd ? "hidden" : "block"}`}
-                />
-              </DialogTrigger>
-              <DialogContent className="bg-white text-black max-sm:w-11/12 shadow shadow-[#754ffe] border border-[#007bff]">
-                <DialogHeader>
-                  <h1>Email Cancellation Form</h1>
-                </DialogHeader>
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleCancel(row.original.id);
-                  }}
-                >
-                  <div>
-                    <Label className="font-bold">Employee Name</Label>
-                    <h1>{user?.name}</h1>
-                  </div>
-                  <div>
-                    <Label className="font-bold">Leave Reason</Label>
-                    <h1>{row.original.reason}</h1>
-                  </div>
-                  <div>
-                    <Label className="font-bold">Leave Days</Label>
-                    <h1>{row.original.totalDays}</h1>
-                  </div>
-                  <div>
-                    <Label className="font-bold">Reason For Cancellation</Label>
-                    <Input
-                      placeholder="Reason..."
-                      autoFocus
-                      type="text"
-                      value={reason}
-                      onChange={(e) => {
-                        setReason(e.target.value);
-                        setError("");
-                      }}
-                    />
-                    {error && <p className="text-red-500 text-sm">{error}</p>}
-                  </div>
-                  <DialogFooter className="pt-3">
-                    <Button
-                      type="submit"
-                      className="bg-[#754ffe] hover:bg-[#6f42c1]"
-                    >
-                      Send
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
+            <TbMailCancel
+              size={25}
+              className={`cursor-pointer ${isEnd ? "hidden" : "block"}`}
+              onClick={() => {
+                setOpenCancel(true);
+                setSelectedUser(user);
+                setSelectedMail(row.original);
+              }}
+            />
           );
         }
       },
@@ -257,6 +216,55 @@ const UserApprovedMailsList = ({ id }: { id: string }) => {
           searchColumn="reason"
           hideSearch={true}
         />
+
+        <Dialog open={openCancel} onOpenChange={() => setOpenCancel(false)}>
+          <DialogContent className="bg-white text-black max-sm:w-11/12 shadow shadow-[#754ffe] border border-[#007bff]">
+            <DialogHeader>
+              <h1 className="font-bold">Email Cancellation Form</h1>
+            </DialogHeader>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleCancel(selectedMail ? selectedMail.id : "");
+              }}
+            >
+              <div>
+                <Label className="font-bold">Employee Name</Label>
+                <h1>{selectedUser?.name}</h1>
+              </div>
+              <div>
+                <Label className="font-bold">Leave Reason</Label>
+                <h1>{selectedMail?.reason}</h1>
+              </div>
+              <div>
+                <Label className="font-bold">Leave Days</Label>
+                <h1>{selectedMail?.totalDays}</h1>
+              </div>
+              <div>
+                <Label className="font-bold">Reason For Cancellation</Label>
+                <Input
+                  placeholder="Reason..."
+                  autoFocus
+                  type="text"
+                  value={reason}
+                  onChange={(e) => {
+                    setReason(e.target.value);
+                    setError("");
+                  }}
+                />
+                {error && <p className="text-red-500 text-sm">{error}</p>}
+              </div>
+              <DialogFooter className="pt-3">
+                <Button
+                  type="submit"
+                  className="bg-[#754ffe] hover:bg-[#6f42c1]"
+                >
+                  Confirm Cancellation
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </Card>
     </section>
   );

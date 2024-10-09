@@ -59,6 +59,17 @@ const Sidebar = ({
 
         <div
           onClick={() => {
+            router.push("/admin/leave-history");
+            setSide?.(!side);
+          }}
+          className="text-[#637085] hover:text-[#94A3B8] p-2 rounded flex gap-4 items-center cursor-pointer"
+        >
+          <Icon icon="ic:sharp-history" fontSize={25} />
+          <p>Leave History</p>
+        </div>
+
+        <div
+          onClick={() => {
             router.push("/admin/mails");
             setSide?.(!side);
           }}
@@ -77,6 +88,17 @@ const Sidebar = ({
         >
           <Icon icon="uil:calender" fontSize={25} />
           <p>Holidays</p>
+        </div>
+
+        <div
+          onClick={() => {
+            router.push("/admin/leave-request");
+            setSide?.(!side);
+          }}
+          className="text-[#637085] hover:text-[#94A3B8] p-2 rounded flex gap-4 items-center cursor-pointer"
+        >
+          <Icon icon="fluent:form-24-regular" fontSize={25} />
+          <p>Leave Apply Form</p>
         </div>
       </nav>
     </div>

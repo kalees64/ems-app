@@ -15,7 +15,7 @@ import {
 
 import { useLeaveApplyStore } from "@/store/leaveApplyStore";
 
-import { LeaveMail } from "@/utils/objectTypes";
+import { Leave, LeaveMail, User } from "@/utils/objectTypes";
 
 import { useUserStore } from "@/store/userStore";
 
@@ -40,6 +40,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { LuArrowDownUp } from "react-icons/lu";
 
 import { CustomTable } from "@/sub-components/CustomTable";
+import Link from "next/link";
 
 const AllMails = () => {
   const { mails, fetchMails, rejectLeave, approveMail } = useLeaveApplyStore();
@@ -100,9 +101,17 @@ const AllMails = () => {
     }
   };
 
-  const newMails = mails.filter(
-    (val) => val.status === "REQUESTED" || val.status === "ON_HOLD"
-  );
+  const newMails = mails.filter((val) => val.status === "REQUESTED");
+
+  const [openApprove, setOpenApprove] = useState<boolean>(false);
+
+  const [openCancel, setOpenCancel] = useState<boolean>(false);
+
+  const [selectedMail, setSelectedMail] = useState<LeaveMail>();
+
+  const [selectedUser, setSelectedUser] = useState<User>();
+
+  const [selectedLeaveType, setSelectedLeaveType] = useState<Leave>();
 
   const columns: ColumnDef<LeaveMail>[] = [
     {
@@ -126,7 +135,11 @@ const AllMails = () => {
       accessorKey: "user",
       cell: ({ row }) => {
         const user = users.find((val) => val.id === row.original.user);
-        return user?.name;
+        return (
+          <Link href={`/admin/mails/view/${row.original.id}`}>
+            {user?.name}
+          </Link>
+        );
       },
     },
     {
@@ -210,129 +223,29 @@ const AllMails = () => {
         );
         return (
           <div className="flex justify-center items-center gap-4">
-            <Dialog>
-              <DialogTrigger>
-                <Icon
-                  icon="duo-icons:approved"
-                  fontSize={30}
-                  className="cursor-pointer"
-                />
-              </DialogTrigger>
-              <DialogContent className="bg-white text-black max-sm:w-11/12 shadow shadow-[#754ffe] border border-[#007bff]">
-                <DialogHeader>
-                  <h1>Email Approval Form</h1>
-                </DialogHeader>
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleApprove(
-                      user ? user.id : "",
-                      leaveType ? leaveType.id : "",
-                      row.original.totalDays,
-                      row.original.id
-                    );
-                  }}
-                >
-                  <div>
-                    <Label className="font-bold">Employee Name</Label>
-                    <h1>{user?.name}</h1>
-                  </div>
-                  <div>
-                    <Label className="font-bold">Start Date</Label>
-                    <h1>{format(row.original.startDate, "dd-MM-yyyy")}</h1>
-                  </div>
-                  <div>
-                    <Label className="font-bold">End Date</Label>
-                    <h1>{format(row.original.endDate, "dd-MM-yyyy")}</h1>
-                  </div>
-                  <div>
-                    <Label className="font-bold">Applied Date</Label>
-                    <h1>
-                      {row.original.appliedOn
-                        ? format(row.original.appliedOn, "dd-MM-yyyy")
-                        : "-"}
-                    </h1>
-                  </div>
-                  <div>
-                    <Label className="font-bold">Leave Reason</Label>
-                    <h1>{row.original.reason}</h1>
-                  </div>
-                  <div>
-                    <Label className="font-bold">Leave Days</Label>
-                    <h1>{row.original.totalDays}</h1>
-                  </div>
-                  <DialogFooter className="pt-3">
-                    <DialogClose asChild>
-                      <Button
-                        type="submit"
-                        className="bg-[#754ffe] hover:bg-[#6f42c1]"
-                      >
-                        Approve
-                      </Button>
-                    </DialogClose>
-                    <DialogClose asChild>
-                      <Button>Close</Button>
-                    </DialogClose>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
+            <Icon
+              icon="duo-icons:approved"
+              fontSize={30}
+              className="cursor-pointer"
+              onClick={() => {
+                setOpenApprove(true);
+                setSelectedMail(row.original);
+                setSelectedUser(user);
+                setSelectedLeaveType(leaveType);
+              }}
+            />
 
-            <Dialog>
-              <DialogTrigger>
-                <Icon
-                  icon="rivet-icons:close-circle"
-                  fontSize={25}
-                  className="cursor-pointer"
-                />
-              </DialogTrigger>
-              <DialogContent className="bg-white text-black max-sm:w-11/12 shadow shadow-[#754ffe] border border-[#007bff]">
-                <DialogHeader>
-                  <h1>Email Rejection Form</h1>
-                </DialogHeader>
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleReject(row.original.id);
-                  }}
-                >
-                  <div>
-                    <Label className="font-bold">Employee Name</Label>
-                    <h1>{user?.name}</h1>
-                  </div>
-                  <div>
-                    <Label className="font-bold">Leave Reason</Label>
-                    <h1>{row.original.reason}</h1>
-                  </div>
-                  <div>
-                    <Label className="font-bold">Leave Days</Label>
-                    <h1>{row.original.totalDays}</h1>
-                  </div>
-                  <div>
-                    <Label className="font-bold">Reason For Rejection</Label>
-                    <Input
-                      placeholder="Reason..."
-                      autoFocus
-                      type="text"
-                      value={reason}
-                      onChange={(e) => {
-                        setReason(e.target.value);
-                        setError("");
-                      }}
-                    />
-                    {error && <p className="text-red-500 text-sm">{error}</p>}
-                  </div>
-                  <DialogFooter className="pt-3">
-                    <Button
-                      type="submit"
-                      className="bg-[#754ffe] hover:bg-[#6f42c1]"
-                    >
-                      Send
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
+            <Icon
+              icon="rivet-icons:close-circle"
+              fontSize={25}
+              className="cursor-pointer"
+              onClick={() => {
+                setOpenCancel(true);
+                setSelectedMail(row.original);
+                setSelectedUser(user);
+                setSelectedLeaveType(leaveType);
+              }}
+            />
           </div>
         );
       },
@@ -363,6 +276,124 @@ const AllMails = () => {
           searchColumn="user"
           hideSearch={true}
         />
+
+        {/* Email Approval Model */}
+        <Dialog open={openApprove} onOpenChange={() => setOpenApprove(false)}>
+          <DialogContent className="bg-white text-black max-sm:w-11/12 shadow shadow-[#754ffe] border border-[#007bff]">
+            <DialogHeader>
+              <h1 className="font-bold">Email Approval Form</h1>
+            </DialogHeader>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleApprove(
+                  selectedMail ? selectedMail.user : "",
+                  selectedMail ? selectedMail.leaveType : "",
+                  selectedMail ? selectedMail.totalDays : 0,
+                  selectedMail ? selectedMail.id : ""
+                );
+              }}
+            >
+              <div>
+                <Label className="font-bold">Employee Name</Label>
+                <h1>{selectedUser?.name}</h1>
+              </div>
+              <div>
+                <Label className="font-bold">Start Date</Label>
+                {selectedMail && (
+                  <h1>{format(selectedMail.startDate, "dd-MM-yyyy")}</h1>
+                )}
+              </div>
+              <div>
+                <Label className="font-bold">End Date</Label>
+                {selectedMail && (
+                  <h1>{format(selectedMail.endDate, "dd-MM-yyyy")}</h1>
+                )}
+              </div>
+              <div>
+                <Label className="font-bold">Applied Date</Label>
+                {selectedMail && (
+                  <h1>
+                    {selectedMail.appliedOn
+                      ? format(selectedMail.appliedOn, "dd-MM-yyyy")
+                      : "-"}
+                  </h1>
+                )}
+              </div>
+              <div>
+                <Label className="font-bold">Leave Reason</Label>
+                <h1>{selectedMail?.reason}</h1>
+              </div>
+              <div>
+                <Label className="font-bold">Total Days</Label>
+                <h1>{selectedMail?.totalDays}</h1>
+              </div>
+              <DialogFooter className="pt-3">
+                <DialogClose asChild>
+                  <Button
+                    type="submit"
+                    className="bg-[#754ffe] hover:bg-[#6f42c1]"
+                  >
+                    Approve Mail
+                  </Button>
+                </DialogClose>
+                <DialogClose asChild>
+                  <Button>Close</Button>
+                </DialogClose>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Email Cancellation Model */}
+        <Dialog open={openCancel} onOpenChange={() => setOpenCancel(false)}>
+          <DialogContent className="bg-white text-black max-sm:w-11/12 shadow shadow-[#754ffe] border border-[#007bff]">
+            <DialogHeader>
+              <h1 className="font-bold">Email Rejection Form</h1>
+            </DialogHeader>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleReject(selectedMail ? selectedMail.id : "");
+              }}
+            >
+              <div>
+                <Label className="font-bold">Employee Name</Label>
+                <h1>{selectedUser?.name}</h1>
+              </div>
+              <div>
+                <Label className="font-bold">Leave Reason</Label>
+                <h1>{selectedMail?.reason}</h1>
+              </div>
+              <div>
+                <Label className="font-bold">Total Days</Label>
+                <h1>{selectedMail?.totalDays}</h1>
+              </div>
+              <div>
+                <Label className="font-bold">Reason For Rejection</Label>
+                <Input
+                  placeholder="Reason..."
+                  autoFocus
+                  type="text"
+                  value={reason}
+                  onChange={(e) => {
+                    setReason(e.target.value);
+                    setError("");
+                  }}
+                />
+                {error && <p className="text-red-500 text-sm">{error}</p>}
+              </div>
+              <DialogFooter className="pt-3">
+                <Button
+                  type="submit"
+                  className="bg-[#754ffe] hover:bg-[#6f42c1]"
+                >
+                  Cancel Mail
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </Card>
     </section>
   );

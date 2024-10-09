@@ -43,20 +43,27 @@ const Login = () => {
     startLoading();
     try {
       const user = await login(data);
+      const roles = user.roles.map((val) => val.key);
       const userRole: string = user.roles[0].key;
       form.reset();
-      if (userRole === "Employee") {
-        setTimeout(() => {
-          toast.success(`Welcome ${user.name}`);
-        }, 100);
-        stopLoading();
-        return router.push(`/employee/${user.id}`);
-      } else if (userRole === "ADMIN") {
+      if (roles.includes("ADMIN")) {
         setTimeout(() => {
           toast.success(`Welcome ${user.name}`);
         }, 100);
         stopLoading();
         return router.push(`/admin`);
+      } else if (roles.includes("Employee")) {
+        setTimeout(() => {
+          toast.success(`Welcome ${user.name}`);
+        }, 100);
+        stopLoading();
+        return router.push(`/employee/${user.id}`);
+      } else {
+        setTimeout(() => {
+          toast.error("Insufficient privileges. Please contact admin");
+        }, 100);
+        stopLoading();
+        return router.push(`/login`);
       }
     } catch (error) {
       form.reset();
@@ -84,7 +91,7 @@ const Login = () => {
                     Email<span className="text-red-500">&nbsp;*</span>
                   </Label>
                   <FormControl>
-                    <Input type="text" {...field} placeholder="abc@gmail.com" />
+                    <Input type="text" {...field} placeholder="Enter email" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -100,7 +107,11 @@ const Login = () => {
                     Password<span className="text-red-500">&nbsp;*</span>
                   </Label>
                   <FormControl>
-                    <Input type="password" {...field} placeholder="••••••••" />
+                    <Input
+                      type="password"
+                      {...field}
+                      placeholder="Enter password"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

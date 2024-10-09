@@ -1,8 +1,7 @@
 import { LeaveBalance, UptLeaveBalance } from "@/utils/objectTypes";
 
-import axios from "axios";
-
 import { create } from "zustand";
+import axiosAPI from "./axiosAPI";
 
 interface LeaveBalanceStore {
   balances: LeaveBalance[];
@@ -16,9 +15,7 @@ export const useLeaveBalanceStore = create<LeaveBalanceStore>((set) => ({
 
   getUserBalanceLeave: async (id: string) => {
     try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/leaveBalance/user/id/${id}`
-      );
+      const res = await axiosAPI.get(`/leaveBalance/user/id/${id}`);
       return res.data.data;
     } catch (error) {
       console.log(error);
@@ -27,9 +24,7 @@ export const useLeaveBalanceStore = create<LeaveBalanceStore>((set) => ({
 
   fetchLeaveBalances: async () => {
     try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/leaveBalance`
-      );
+      const res = await axiosAPI.get(`/leaveBalance`);
       set({ balances: res.data.data });
     } catch (error) {
       console.log(error);
@@ -38,10 +33,7 @@ export const useLeaveBalanceStore = create<LeaveBalanceStore>((set) => ({
 
   approveLeave: async (id, data) => {
     try {
-      const res = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/leaveBalance/id/${id}`,
-        data
-      );
+      const res = await axiosAPI.put(`/leaveBalance/id/${id}`, data);
       set((state) => ({
         balances: state.balances.map((val) =>
           val.id === id ? res.data.data : val

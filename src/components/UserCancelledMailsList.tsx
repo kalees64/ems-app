@@ -69,11 +69,11 @@ const UserCancelledMailsList = ({ id }: { id: string }) => {
       },
     },
     {
-      header: "Approved Date",
+      header: "Cancelled Date",
       accessorKey: "approvedDate",
       cell: ({ row }) => {
-        if (row.original.approvedDate) {
-          return format(row.original.approvedDate, "dd-MM-yyyy");
+        if (row.original.cancelledDate) {
+          return format(row.original.cancelledDate, "dd-MM-yyyy");
         } else {
           return "...";
         }

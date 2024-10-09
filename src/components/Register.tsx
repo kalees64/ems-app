@@ -49,6 +49,12 @@ const Register = ({ admin }: { admin: boolean }) => {
 
   const [gender, setGender] = useState<string>();
 
+  const [doj, setDoj] = useState<string>();
+
+  const [dob, setDob] = useState<string>();
+
+  const [doError, setDoError] = useState({ doj: "", dob: "" });
+
   const [error, setError] = useState<string>();
 
   const form = useForm({
@@ -62,16 +68,36 @@ const Register = ({ admin }: { admin: boolean }) => {
   });
 
   const formSubmit: SubmitHandler<T_registerData> = async (data) => {
+    if (!gender && !doj && !dob) {
+      setError("Please select gender");
+      return setDoError({
+        doj: "Please select date of joining",
+        dob: "Please select date of birth",
+      });
+    }
+
     if (!gender) {
       return setError("Please select gender");
     }
 
-    const today = new Date();
-    const doj = format(today, "yyyy-MM-dd");
+    if (!doj) {
+      return setDoError({
+        ...doError,
+        dob: "Please select date of joining",
+      });
+    }
+    if (!dob) {
+      return setDoError({
+        ...doError,
+        doj: "Please select date of joining",
+      });
+    }
+
     const newData = {
       ...data,
-      phone: "+91-" + data.phone,
+      phone: data.phone,
       doj,
+      dob,
       gender,
     };
     startLoading();
@@ -109,6 +135,8 @@ const Register = ({ admin }: { admin: boolean }) => {
     }
   };
 
+  const today = new Date().toJSON().substring(0, 10);
+
   return (
     <main className="w-full h-full flex justify-center items-center  bg-cover bg-[#f1f5f9]">
       <div className="w-96 mx-auto p-4 shadow  max-sm:w-72 rounded-lg bg-white/60 relative text-black">
@@ -127,7 +155,7 @@ const Register = ({ admin }: { admin: boolean }) => {
                     Name<span className="text-red-500">&nbsp;*</span>
                   </Label>
                   <FormControl>
-                    <Input type="text" {...field} placeholder="Robert" />
+                    <Input type="text" {...field} placeholder="Enter name" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -143,11 +171,7 @@ const Register = ({ admin }: { admin: boolean }) => {
                     Email<span className="text-red-500">&nbsp;*</span>
                   </Label>
                   <FormControl>
-                    <Input
-                      type="text"
-                      {...field}
-                      placeholder="robert@gmail.com"
-                    />
+                    <Input type="text" {...field} placeholder="Enter email" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -167,7 +191,7 @@ const Register = ({ admin }: { admin: boolean }) => {
                       type="text"
                       {...field}
                       required={false}
-                      placeholder="9656458767"
+                      placeholder="Enter phone number"
                     />
                   </FormControl>
                   <FormMessage />
@@ -184,7 +208,11 @@ const Register = ({ admin }: { admin: boolean }) => {
                     Password<span className="text-red-500">&nbsp;*</span>
                   </Label>
                   <FormControl>
-                    <Input type="password" {...field} placeholder="••••••••" />
+                    <Input
+                      type="password"
+                      {...field}
+                      placeholder="Enter password"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -204,7 +232,7 @@ const Register = ({ admin }: { admin: boolean }) => {
               >
                 <SelectTrigger>
                   <SelectValue
-                    placeholder="Gender"
+                    placeholder="Select gender"
                     className="text-[#637085]"
                   />
                 </SelectTrigger>
@@ -218,6 +246,47 @@ const Register = ({ admin }: { admin: boolean }) => {
                 </SelectContent>
               </Select>
               {error && <p className="text-sm text-red-500">{error}</p>}
+            </div>
+
+            <div>
+              <Label className="text-[#637085]">
+                Date of Joining<span className="text-red-500">&nbsp;*</span>
+              </Label>
+              <Input
+                type="date"
+                value={doj}
+                onChange={(e) => {
+                  setDoj(e.target.value);
+                  setDoError({
+                    ...doError,
+                    doj: "",
+                  });
+                }}
+              />
+              {doError.doj && (
+                <p className="text-sm text-red-500">{doError.doj}</p>
+              )}
+            </div>
+
+            <div>
+              <Label className="text-[#637085]">
+                Date of Birth<span className="text-red-500">&nbsp;*</span>
+              </Label>
+              <Input
+                type="date"
+                value={dob}
+                max={today}
+                onChange={(e) => {
+                  setDob(e.target.value);
+                  setDoError({
+                    ...doError,
+                    dob: "",
+                  });
+                }}
+              />
+              {doError.dob && (
+                <p className="text-sm text-red-500">{doError.dob}</p>
+              )}
             </div>
 
             <div className="pt-3 w-full">

@@ -15,6 +15,8 @@ import { useLeaveApplyStore } from "@/store/leaveApplyStore";
 
 import { useLeavesStore } from "@/store/leaveStore";
 
+import { useUserStore } from "@/store/userStore";
+
 import { LeaveData } from "@/utils/objectTypes";
 
 import { format } from "date-fns";
@@ -25,12 +27,14 @@ import React, { useEffect, useState } from "react";
 
 import { toast } from "sonner";
 
-const RequestFormView = () => {
+const AdminLeaveRequestConfirmation = () => {
   const [data, setData] = useState<LeaveData>();
 
   const router = useRouter();
 
   const { leaves } = useLeavesStore();
+
+  const { users, fetchUsers } = useUserStore();
 
   const { applyLeave } = useLeaveApplyStore();
 
@@ -45,12 +49,14 @@ const RequestFormView = () => {
 
   const leaveName = leaves.find((val) => val.id === data?.leaveType);
 
+  const user = users.find((val) => val.id === data?.user);
+
   const handleApply = async () => {
     if (data) {
       try {
         applyLeave(data);
         localStorage.removeItem("formData");
-        router.push(`/employee/${data.user}`);
+        router.push(`/admin/leave-request`);
       } catch (error) {
         console.log(error);
         return setTimeout(() => {
@@ -63,8 +69,8 @@ const RequestFormView = () => {
 
   useEffect(() => {
     getData();
+    fetchUsers();
   }, []);
-
   return (
     <section>
       <h2 className="text-2xl font-bold pb-4">Leave Request Confirmation</h2>
@@ -77,6 +83,10 @@ const RequestFormView = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
+          <TableRow>
+            <TableHead className="text-black">Employee Name</TableHead>
+            <TableCell>{user?.name}</TableCell>
+          </TableRow>
           <TableRow>
             <TableHead className="text-black">Start Date</TableHead>
             <TableCell>
@@ -125,4 +135,4 @@ const RequestFormView = () => {
   );
 };
 
-export default RequestFormView;
+export default AdminLeaveRequestConfirmation;

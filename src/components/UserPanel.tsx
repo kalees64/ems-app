@@ -30,7 +30,7 @@ Chart.register(BarController, BarElement, CategoryScale, LinearScale);
 
 export interface BalanceLeave {
   totalLeaves: number;
-  remainingLeaves: number;
+  usedLeaves: number;
   sickLeaves: number;
   casualLeaves: number;
   paidLeaves: number;
@@ -47,7 +47,7 @@ const UserPanel = ({ id }: { id: string }) => {
 
   const [leaveBalace, setLeaveBalance] = useState<BalanceLeave>({
     totalLeaves: 0,
-    remainingLeaves: 0,
+    usedLeaves: 0,
     sickLeaves: 0,
     casualLeaves: 0,
     paidLeaves: 0,
@@ -59,14 +59,14 @@ const UserPanel = ({ id }: { id: string }) => {
     const res = await getUserBalanceLeave(id);
     setLeaves(res);
     let totalLeave: number = 0;
-    let balanceLeave: number = 0;
+    let usedLeave: number = 0;
     let sickLeave: number = 0;
     let casualLeave: number = 0;
     let paidLeave: number = 0;
 
     res.forEach((val) => {
       totalLeave += val.allocated;
-      balanceLeave += val.remaining;
+      usedLeave += val.used;
       if (val.leaveType.key === "SICK_LEAVE") {
         sickLeave = val.used;
       }
@@ -79,7 +79,7 @@ const UserPanel = ({ id }: { id: string }) => {
     });
     setLeaveBalance({
       totalLeaves: totalLeave,
-      remainingLeaves: balanceLeave,
+      usedLeaves: usedLeave,
       sickLeaves: sickLeave,
       casualLeaves: casualLeave,
       paidLeaves: paidLeave,
@@ -174,9 +174,9 @@ const UserPanel = ({ id }: { id: string }) => {
 
           <div className="p-4 bg-white shadow-md rounded-lg text-center">
             <h3 className="text-lg font-semibold text-[#637085]">
-              Pending Leaves
+              Leaves Taken
             </h3>
-            <p className="text-2xl font-bold">{leaveBalace.remainingLeaves}</p>
+            <p className="text-2xl font-bold">{leaveBalace.usedLeaves}</p>
             <p className="text-sm text-[#637085]">Days</p>
           </div>
 
@@ -205,7 +205,11 @@ const UserPanel = ({ id }: { id: string }) => {
           </div>
 
           <div className="bg-white shadow-md rounded-lg p-6">
-            <h3 className="text-xl font-bold mb-4">Holiday Calender</h3>
+            <h3 className="text-xl font-bold mb-1">Holiday Calender</h3>
+            <div className="flex items-center pb-2 justify-center">
+              <span className=" size-3 rounded-full p-0.5 bg-green-500"></span>
+              <span className="mx-2">Holiday</span>
+            </div>
             <Calendar holidays={holidaysList} />
           </div>
         </div>

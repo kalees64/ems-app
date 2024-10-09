@@ -103,11 +103,11 @@ const Calendar: React.FC<CalendarProps> = ({
                   : isToday && isHoliday
                   ? "bg-gradient-to-r from-red-500 to-blue-500 text-white"
                   : isHoliday
-                  ? "bg-red-500 text-white" // Holiday date styling
+                  ? "bg-green-500 text-white" // Holiday date styling
                   : isSameDay(day, selectedDate ? selectedDate : "")
-                  ? "bg-blue-500 text-white"
+                  ? "bg-gray-500 text-white"
                   : isToday
-                  ? "bg-blue-500 text-white "
+                  ? "bg-gray-500 text-white "
                   : "hover:bg-blue-100"
               }`}
             >

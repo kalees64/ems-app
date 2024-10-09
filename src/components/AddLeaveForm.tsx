@@ -57,7 +57,7 @@ const AddLeaveForm = () => {
   return (
     <main className="w-full h-full flex justify-center items-center  bg-cover bg-[#f1f5f9]">
       <div className="w-96 mx-auto p-4 shadow  max-sm:w-72 rounded-lg bg-white/60 relative text-black">
-        <h2 className="text-2xl font-bold mb-6 text-center">Add Leave</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">Add Leave Type</h2>
 
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(formSubmit)}>

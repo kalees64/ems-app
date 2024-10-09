@@ -1,10 +1,10 @@
 import { Leave, UpdateLeave } from "@/utils/objectTypes";
 
-import axios from "axios";
-
 import { toast } from "sonner";
 
 import { create } from "zustand";
+import { getToken } from "./userStore";
+import axiosAPI from "./axiosAPI";
 
 interface LeaveStore {
   leaves: Leave[];
@@ -20,9 +20,7 @@ export const useLeavesStore = create<LeaveStore>((set) => ({
 
   fetchLeaves: async () => {
     try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/leaveTypes`
-      );
+      const res = await axiosAPI.get(`/leaveTypes`);
       set({ leaves: res.data.data });
     } catch (error) {
       console.log(error);
@@ -31,10 +29,7 @@ export const useLeavesStore = create<LeaveStore>((set) => ({
 
   addLeave: async (data) => {
     try {
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/leaveTypes`,
-        data
-      );
+      const res = await axiosAPI.post(`/leaveTypes`, data);
       set((state) => ({ leaves: [...state.leaves, res.data.data] }));
       setTimeout(() => {
         toast.success("Leave Added");
@@ -46,9 +41,7 @@ export const useLeavesStore = create<LeaveStore>((set) => ({
 
   deleteLeave: async (id) => {
     try {
-      const res = await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/leaveTypes/id/${id}`
-      );
+      const res = await axiosAPI.delete(`/leaveTypes/id/${id}`);
       set((state) => ({
         leaves: state.leaves.filter((val) => val.id !== res.data.data.id),
       }));
@@ -62,10 +55,7 @@ export const useLeavesStore = create<LeaveStore>((set) => ({
 
   updateLeave: async (id, data) => {
     try {
-      const res = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/leaveTypes/id/${id}`,
-        data
-      );
+      const res = await axiosAPI.put(`/leaveTypes/id/${id}`, data);
       set((state) => ({
         leaves: state.leaves.map((val) =>
           val.id === id ? res.data.data : val
@@ -81,9 +71,7 @@ export const useLeavesStore = create<LeaveStore>((set) => ({
 
   getLeave: async (id) => {
     try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/leaveTypes/id/${id}`
-      );
+      const res = await axiosAPI.get(`/leaveTypes/id/${id}`);
       return res.data.data;
     } catch (error) {
       console.log(error);

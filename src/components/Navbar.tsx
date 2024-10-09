@@ -20,12 +20,14 @@ import Sidebar from "./Sidebar";
 
 import { useRouter } from "next/navigation";
 
-import { useLoadStore } from "@/store/authStore";
+import { useAuthStore, useLoadStore } from "@/store/authStore";
 
 const Navbar = () => {
   const [side, setSide] = useState<boolean>(false);
 
   const router = useRouter();
+
+  const { logout } = useAuthStore();
 
   const { loading, startLoading, stopLoading } = useLoadStore();
 
@@ -67,7 +69,7 @@ const Navbar = () => {
                 className="bg-[#754ffe] hover:bg-[#6f42c1]"
                 onClick={() => {
                   startLoading();
-                  // logout();
+                  logout();
                   localStorage.removeItem("token");
                   stopLoading();
                   router.push("/login");

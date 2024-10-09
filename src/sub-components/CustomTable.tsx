@@ -80,8 +80,8 @@ export function CustomTable<TData, TValue>({
         </div>
       )}
 
-      <Table>
-        <TableHeader className="bg-[#f1f5f9] text-black">
+      <Table className="rounded-xl">
+        <TableHeader className="bg-[#f1f5f9] text-black  ">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {

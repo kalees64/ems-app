@@ -20,45 +20,46 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { useLoadStore } from "@/store/authStore";
 
+import axiosAPI from "@/store/axiosAPI";
+
 import { useLeaveApplyStore } from "@/store/leaveApplyStore";
 
-import { useLeaveBalanceStore } from "@/store/leaveBalanceStore";
-
 import { useLeavesStore } from "@/store/leaveStore";
+
+import { useUserStore } from "@/store/userStore";
 
 import { LeaveBalance, LeaveDataCopy, LeaveMail } from "@/utils/objectTypes";
 
 import { format, isBefore, isSameDay, parseISO } from "date-fns";
 
+import { useRouter } from "next/navigation";
+
 import React, { useEffect, useState } from "react";
 
 import { toast } from "sonner";
 
-import LeaveFormPageLeaves from "./LeaveFormPageLeaves";
-
-import { useRouter } from "next/navigation";
-
-import axiosAPI from "@/store/axiosAPI";
-
-const LeaveRequestForm = ({ id }: { id: string }) => {
+const AdminLeaveApplyForm = () => {
   const router = useRouter();
 
   const { leaves, fetchLeaves } = useLeavesStore();
 
   const { mails, fetchMails } = useLeaveApplyStore();
 
-  const { loading, startLoading, stopLoading } = useLoadStore();
+  const { users, fetchUsers } = useUserStore();
 
-  const { getUserBalanceLeave } = useLeaveBalanceStore();
+  const { loading, startLoading, stopLoading } = useLoadStore();
 
   const [errors, setErrors] = useState<LeaveDataCopy>({
     leaveType: "",
     startDate: "",
     endDate: "",
     reason: "",
+    user: "",
   });
 
   const [leaveType, setLeaveType] = useState<string>("");
+
+  const [user, setUser] = useState<string>();
 
   const [startDate, setStartDate] = useState<string>("");
 
@@ -76,11 +77,6 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
 
   const [remainingDays, setRemainingDays] = useState<number>(0);
 
-  const getLeaveBalances = async () => {
-    const res = await getUserBalanceLeave(id);
-    setLeaveBalances(res);
-  };
-
   const handleSubmit = async () => {
     startLoading();
     if (!leaveType && !startDate && !endDate && !reason) {
@@ -90,6 +86,7 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
         startDate: "Please select start date",
         endDate: "Please select end date",
         reason: "Please enter the reason",
+        user: "Please select user",
       });
     }
 
@@ -98,6 +95,14 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
       return setErrors({
         ...errors,
         leaveType: "Please select leave type",
+      });
+    }
+
+    if (!user) {
+      stopLoading();
+      return setErrors({
+        ...errors,
+        user: "Please select leave type",
       });
     }
 
@@ -153,13 +158,13 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
       totalDays,
       halfDay,
       reason,
-      user: id,
+      user,
       status: "REQUESTED",
     };
 
     localStorage.setItem("formData", JSON.stringify(data));
 
-    router.push(`/employee/${id}/leave-request/view`);
+    router.push(`/admin/leave-request/view`);
 
     setLeaveType("");
     setStartDate("");
@@ -181,17 +186,16 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
   useEffect(() => {
     fetchLeaves();
     fetchMails();
-    getLeaveBalances();
+    fetchUsers();
   }, []);
-
   return (
-    <div className="flex max-sm:w-96 max-sm:flex-col gap-5 ">
+    <section>
       <form
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
         }}
-        className="w-96 "
+        className="w-96 bg-white rounded-xl mx-auto p-4"
       >
         <div>
           <Label>
@@ -201,11 +205,6 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
           <Select
             value={leaveType}
             onValueChange={(value) => {
-              leaveBalances?.forEach((val) => {
-                if (val.leaveType.id === value) {
-                  setRemainingDays(val.remaining);
-                }
-              });
               setLeaveType(value);
               setErrors({ ...errors, leaveType: "" });
             }}
@@ -233,13 +232,53 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
           )}
         </div>
 
-        {leaveType ? (
+        <div>
+          <Label>
+            Employee ID<span className="text-red-500">&nbsp;*</span>
+          </Label>
+
+          <Select
+            value={user}
+            onValueChange={(value) => {
+              leaveBalances?.forEach((val) => {
+                if (val.user.id === value) {
+                  if (val.leaveType.id === leaveType) {
+                    setRemainingDays(val.remaining);
+                  }
+                }
+              });
+              setUser(value);
+              setErrors({ ...errors, user: "" });
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Employee ID" />
+            </SelectTrigger>
+
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Employee</SelectLabel>
+                {users.map((val) => {
+                  return (
+                    <SelectItem value={val.id} key={val.id}>
+                      {val.name}
+                    </SelectItem>
+                  );
+                })}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+
+          {errors.user && <p className="text-red-500 text-sm">{errors.user}</p>}
+        </div>
+
+        {/* {remainingDays ? (
           <div>
             <Label>Available Days</Label>
 
             <Input readOnly value={remainingDays} disabled />
           </div>
-        ) : null}
+        ) : null} */}
 
         <div>
           <Label>
@@ -337,16 +376,16 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
 
               const totalDays = Number(total);
 
-              if (totalDays > remainingDays) {
-                return setTimeout(() => {
-                  toast.error("Total days not greater than remaing days");
-                  setSameDay(false);
-                  setErrors({
-                    ...errors,
-                    endDate: "Total days not greater than remaing days",
-                  });
-                }, 100);
-              }
+              //   if (totalDays > remainingDays) {
+              //     return setTimeout(() => {
+              //       toast.error("Total days not greater than remaing days");
+              //       setSameDay(false);
+              //       setErrors({
+              //         ...errors,
+              //         endDate: "Total days not greater than remaing days",
+              //       });
+              //     }, 100);
+              //   }
 
               setTotalDays(totalDays);
               setSameDay(false);
@@ -433,11 +472,8 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
           </Button>
         </div>
       </form>
-      <div className="w-96 bg-red-500 h-full ">
-        <LeaveFormPageLeaves id={id} />
-      </div>
-    </div>
+    </section>
   );
 };
 
-export default LeaveRequestForm;
+export default AdminLeaveApplyForm;

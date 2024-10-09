@@ -37,6 +37,9 @@ import { Toaster } from "sonner";
 import { format } from "date-fns";
 
 import { useLoadStore } from "@/store/authStore";
+import { ColumnDef } from "@tanstack/react-table";
+import { LuArrowDownUp } from "react-icons/lu";
+import { CustomTable } from "@/sub-components/CustomTable";
 
 const HolidaysList = () => {
   const { holidays, fetchHolidays, addHoliday, updateHoliday, deleteHoliday } =
@@ -137,6 +140,83 @@ const HolidaysList = () => {
 
     await updateHoliday(id, updatedData);
   };
+
+  const [openEdit, setOpenEdit] = useState<boolean>(false);
+
+  const [openDel, setOpenDel] = useState<boolean>(false);
+
+  const [selectedHoliday, setSelectedHoliday] = useState<Holiday>();
+
+  const columns: ColumnDef<Holiday>[] = [
+    {
+      header: "S.No",
+      accessorFn: (_, index) => {
+        return index + 1;
+      },
+    },
+    {
+      header: "Holiday Name",
+      accessorKey: "name",
+    },
+    {
+      header: ({ column }) => {
+        return (
+          <span
+            className="flex items-center cursor-pointer gap-1"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Date
+            <LuArrowDownUp className=" h-3 w-3 " />
+          </span>
+        );
+      },
+      accessorKey: "date",
+      cell: ({ row }) => {
+        return format(row.original.date, "dd-MM-yyyy");
+      },
+    },
+    {
+      header: "Day",
+      cell: ({ row }) => {
+        return format(row.original.date, "EEEE");
+      },
+    },
+    {
+      header: "Description",
+      accessorKey: "shortDescription",
+    },
+    {
+      header: "Action",
+      cell: ({ row }) => {
+        return (
+          <div className="flex gap-3 items-center ">
+            <Icon
+              icon="material-symbols-light:edit-calendar-outline"
+              fontSize={30}
+              className=" cursor-pointer"
+              onClick={() => {
+                setOpenEdit(true);
+                setSelectedHoliday(row.original);
+                setuName(row.original.name);
+                setuDate(row.original.date);
+                setuShortDescription(row.original?.shortDescription);
+              }}
+            />
+
+            <Icon
+              icon="ic:baseline-delete-forever"
+              fontSize={30}
+              className="cursor-pointer"
+              onClick={() => {
+                setOpenDel(true);
+                setSelectedHoliday(row.original);
+              }}
+            />
+          </div>
+        );
+      },
+    },
+  ];
 
   useEffect(() => {
     fetchHolidays();
@@ -244,189 +324,128 @@ const HolidaysList = () => {
         </div>
 
         <div className="">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-[#f1f5f9]">
-                <TableHead className="font-bold text-black">S.No</TableHead>
-                <TableHead className="font-bold text-black">
-                  Leave Name
-                </TableHead>
-                <TableHead className="font-bold text-black">
-                  Leave Date
-                </TableHead>
-                <TableHead className="font-bold text-black">
-                  Leave Description
-                </TableHead>
-                <TableHead className="font-bold text-black">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody className="text-[#637085]">
-              {holidays.length > 0 ? (
-                holidays.map((data: Holiday, index) => {
-                  return (
-                    <TableRow key={data.id}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell className="text-black">{data.name}</TableCell>
-                      <TableCell>{format(data.date, "dd-MM-yyyy")}</TableCell>
-                      <TableCell>
-                        {data.shortDescription ? data.shortDescription : "-"}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-3 items-center ">
-                          <div>
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Icon
-                                  icon="material-symbols-light:edit-calendar-outline"
-                                  fontSize={30}
-                                  className=" cursor-pointer"
-                                  onClick={() => {
-                                    setuName(data.name);
-                                    setuDate(data.date);
-                                    setuShortDescription(
-                                      data?.shortDescription
-                                    );
-                                  }}
-                                />
-                              </DialogTrigger>
-
-                              <DialogContent className="bg-white text-black max-sm:w-11/12 shadow shadow-[#754ffe] border border-[#007bff]">
-                                <DialogHeader>
-                                  <DialogTitle>Update Holiday</DialogTitle>
-
-                                  <DialogDescription className="hidden">
-                                    holiday
-                                  </DialogDescription>
-
-                                  <form
-                                    onSubmit={(e) => {
-                                      e.preventDefault();
-                                      handleUpdate(
-                                        data.id ? data.id : "id",
-                                        data
-                                      );
-                                    }}
-                                  >
-                                    <div>
-                                      <Label>Holiday Name</Label>
-
-                                      <Input
-                                        placeholder="Diwali"
-                                        value={uname}
-                                        onChange={(e) => {
-                                          setuName(e.target.value);
-                                          setErrors({ ...errors, name: "" });
-                                        }}
-                                      />
-
-                                      {errors.name && (
-                                        <p className="text-red-500 text-sm">
-                                          {errors.name}
-                                        </p>
-                                      )}
-                                    </div>
-
-                                    <div className="pt-2">
-                                      <Label>Holiday Date</Label>
-
-                                      <Input
-                                        type="date"
-                                        value={udate.slice(0, 10)}
-                                        onChange={(e) => {
-                                          setuDate(e.target.value);
-                                          setErrors({ ...errors, date: "" });
-                                        }}
-                                      />
-
-                                      {errors.date && (
-                                        <p className="text-red-500 text-sm">
-                                          {errors.date}
-                                        </p>
-                                      )}
-                                    </div>
-
-                                    <div className=" pt-2 pb-3">
-                                      <Label>Holiday Description</Label>
-
-                                      <Input
-                                        type="text"
-                                        value={ushortDescription}
-                                        onChange={(e) => {
-                                          setuShortDescription(e.target.value);
-                                        }}
-                                        placeholder="Diwali Festival"
-                                      />
-                                    </div>
-
-                                    <DialogClose asChild>
-                                      <Button
-                                        type="submit"
-                                        className="bg-[#754ffe] hover:bg-[#6f42c1]"
-                                      >
-                                        update
-                                      </Button>
-                                    </DialogClose>
-                                  </form>
-                                </DialogHeader>
-                              </DialogContent>
-                            </Dialog>
-                          </div>
-
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Icon
-                                icon="ic:baseline-delete-forever"
-                                fontSize={30}
-                                className="cursor-pointer"
-                              />
-                            </DialogTrigger>
-
-                            <DialogContent className="bg-white text-black max-sm:w-11/12 shadow shadow-[#754ffe] border border-[#007bff]">
-                              <DialogHeader>
-                                <DialogTitle>
-                                  Do you want delete {data.name}?
-                                </DialogTitle>
-
-                                <DialogDescription>
-                                  Click yes to delete
-                                </DialogDescription>
-                              </DialogHeader>
-
-                              <div className="flex gap-5">
-                                <DialogClose asChild>
-                                  <Button
-                                    className="bg-[#754ffe] hover:bg-[#6f42c1]"
-                                    onClick={async () => {
-                                      await deleteHoliday(
-                                        data.id ? data.id : "id"
-                                      );
-                                    }}
-                                  >
-                                    Yes
-                                  </Button>
-                                </DialogClose>
-                                <DialogClose asChild>
-                                  <Button className="bg-red-700">Cancel</Button>
-                                </DialogClose>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center">
-                    No Data
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+          <CustomTable
+            columns={columns}
+            data={holidays}
+            placeholder="Filter by Holiday name..."
+            searchColumn="name"
+            hideSearch={false}
+          />
         </div>
+
+        {/* Edit Holiday Dialog */}
+        <Dialog open={openEdit} onOpenChange={() => setOpenEdit(false)}>
+          <DialogContent className="bg-white text-black max-sm:w-11/12 shadow shadow-[#754ffe] border border-[#007bff]">
+            <DialogHeader>
+              <DialogTitle>Update Holiday</DialogTitle>
+
+              <DialogDescription className="hidden">holiday</DialogDescription>
+
+              {selectedHoliday && (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (selectedHoliday.id) {
+                      handleUpdate(
+                        selectedHoliday ? selectedHoliday.id : "",
+                        selectedHoliday
+                      );
+                    }
+                  }}
+                >
+                  <div>
+                    <Label>Holiday Name</Label>
+
+                    <Input
+                      placeholder="Diwali"
+                      value={uname}
+                      onChange={(e) => {
+                        setuName(e.target.value);
+                        setErrors({ ...errors, name: "" });
+                      }}
+                    />
+
+                    {errors.name && (
+                      <p className="text-red-500 text-sm">{errors.name}</p>
+                    )}
+                  </div>
+
+                  <div className="pt-2">
+                    <Label>Holiday Date</Label>
+
+                    <Input
+                      type="date"
+                      value={udate.slice(0, 10)}
+                      onChange={(e) => {
+                        setuDate(e.target.value);
+                        setErrors({ ...errors, date: "" });
+                      }}
+                    />
+
+                    {errors.date && (
+                      <p className="text-red-500 text-sm">{errors.date}</p>
+                    )}
+                  </div>
+
+                  <div className=" pt-2 pb-3">
+                    <Label>Holiday Description</Label>
+
+                    <Input
+                      type="text"
+                      value={ushortDescription}
+                      onChange={(e) => {
+                        setuShortDescription(e.target.value);
+                      }}
+                      placeholder="Diwali Festival"
+                    />
+                  </div>
+
+                  <DialogClose asChild>
+                    <Button
+                      type="submit"
+                      className="bg-[#754ffe] hover:bg-[#6f42c1]"
+                    >
+                      update
+                    </Button>
+                  </DialogClose>
+                </form>
+              )}
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Holiday Dialog */}
+        <Dialog open={openDel} onOpenChange={() => setOpenDel(false)}>
+          <DialogContent className="bg-white text-black max-sm:w-11/12 shadow shadow-[#754ffe] border border-[#007bff]">
+            <DialogHeader>
+              <DialogTitle>
+                Do you want delete {selectedHoliday?.name}?
+              </DialogTitle>
+
+              <DialogDescription>Click yes to delete</DialogDescription>
+            </DialogHeader>
+
+            <div className="flex gap-5">
+              <DialogClose asChild>
+                {selectedHoliday && (
+                  <Button
+                    className="bg-[#754ffe] hover:bg-[#6f42c1]"
+                    onClick={async () => {
+                      await deleteHoliday(
+                        selectedHoliday.id ? selectedHoliday.id : ""
+                      );
+                    }}
+                  >
+                    Yes
+                  </Button>
+                )}
+              </DialogClose>
+              <DialogClose asChild>
+                <Button className="bg-red-700">Cancel</Button>
+              </DialogClose>
+            </div>
+          </DialogContent>
+        </Dialog>
       </section>
       <Toaster richColors position="top-center" />
     </div>

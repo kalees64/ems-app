@@ -16,6 +16,7 @@ import { useUserStore } from "@/store/userStore";
 import { User } from "@/utils/objectTypes";
 
 import { useLeaveBalanceStore } from "@/store/leaveBalanceStore";
+import Link from "next/link";
 
 const Reports = () => {
   const { users, fetchUsers } = useUserStore();
@@ -54,7 +55,7 @@ const Reports = () => {
                 Paid Leaves
               </TableHead>
               <TableHead className="font-bold text-black">
-                Pending Leaves
+                Available Leaves
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -87,7 +88,9 @@ const Reports = () => {
                 return (
                   <TableRow key={user.id}>
                     <TableCell>{index + 1}</TableCell>
-                    <TableCell className="text-black">{user.name}</TableCell>
+                    <TableCell className="text-black">
+                      <Link href={`/admin/emp/${user.id}`}>{user.name}</Link>
+                    </TableCell>
                     <TableCell>{totalLeave}</TableCell>
                     <TableCell>{casualLeave}</TableCell>
                     <TableCell>{sickLeave}</TableCell>

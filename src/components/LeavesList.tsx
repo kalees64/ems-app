@@ -71,7 +71,7 @@ const LeavesList = () => {
           className="bg-[#6343d8] hover:bg-[#593cc1] p-2 rounded text-white flex gap-2 items-center cursor-pointer"
         >
           <Icon icon="gg:add-r" fontSize={25} />
-          <p>Add Leave</p>
+          <p>Add leave type</p>
         </Link>
       </div>
 
@@ -88,6 +88,9 @@ const LeavesList = () => {
               <TableHead className="font-bold text-black">
                 Leave Count
               </TableHead>
+              {/* <TableHead className="font-bold text-black">
+                Carry Forward
+              </TableHead> */}
               <TableHead className="text-black text-center font-bold">
                 Action
               </TableHead>
@@ -102,6 +105,7 @@ const LeavesList = () => {
                     <TableCell>{index + 1}</TableCell>
                     <TableCell className="text-black">{leave.name}</TableCell>
                     <TableCell>{leave.count}</TableCell>
+                    {/* <TableCell>{leave.carryForward ? "Yes" : "-"}</TableCell> */}
                     <TableCell className="flex items-center gap-3 justify-center">
                       <Dialog>
                         <DialogTrigger asChild>

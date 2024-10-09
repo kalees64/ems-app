@@ -1,10 +1,9 @@
 import { Holiday } from "@/utils/objectTypes";
 
-import axios from "axios";
-
 import { toast } from "sonner";
 
 import { create } from "zustand";
+import axiosAPI from "./axiosAPI";
 
 interface HolidayStore {
   holidays: Holiday[];
@@ -22,7 +21,7 @@ export const useHolidayStore = create<HolidayStore>((set) => ({
 
   fetchHolidays: async () => {
     try {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/holiday`);
+      const res = await axiosAPI.get(`/holiday`);
       set({ holidays: res.data.data });
 
       const list: string[] = res.data.data.map((val: Holiday) => {
@@ -37,10 +36,7 @@ export const useHolidayStore = create<HolidayStore>((set) => ({
 
   addHoliday: async (data) => {
     try {
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/holiday`,
-        data
-      );
+      const res = await axiosAPI.post(`/holiday`, data);
       set((state) => ({ holidays: [...state.holidays, res.data.data] }));
       setTimeout(() => {
         toast.success("Holiday Added");
@@ -52,10 +48,7 @@ export const useHolidayStore = create<HolidayStore>((set) => ({
 
   updateHoliday: async (id, data) => {
     try {
-      const res = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/holiday/id/${id}`,
-        data
-      );
+      const res = await axiosAPI.put(`/holiday/id/${id}`, data);
       set((state) => ({
         holidays: state.holidays.map((val) =>
           val.id === id ? res.data.data : val
@@ -71,9 +64,7 @@ export const useHolidayStore = create<HolidayStore>((set) => ({
 
   deleteHoliday: async (id) => {
     try {
-      const res = await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/holiday/id/${id}`
-      );
+      const res = await axiosAPI.delete(`/holiday/id/${id}`);
       set((state) => ({
         holidays: state.holidays.filter((val) => val.id !== res.data.data.id),
       }));

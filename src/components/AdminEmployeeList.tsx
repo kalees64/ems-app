@@ -48,20 +48,65 @@ const AdminEmployeeList = () => {
     deleteUser(id);
   };
 
+  const [openEdit, setOpenEdit] = useState<boolean>(false);
+
+  const [openDel, setOpenDel] = useState<boolean>(false);
+
+  const [selectedUser, setSelectedUser] = useState<User>();
+
   const [name, setName] = useState<string>("");
 
   const [phone, setPhone] = useState<string>("");
 
   const [dob, setDob] = useState<string>("");
 
+  const [dor, setDor] = useState<string>("");
+
+  const [errors, setErrors] = useState({
+    name,
+    phone,
+    dob,
+  });
+
   const handleSubmit = async (id: string) => {
+    if (!name && !phone && !dob) {
+      return setErrors({
+        name: "Please enter name",
+        phone: "Please enter phone",
+        dob: "Please select dob",
+      });
+    }
+
+    if (!name) {
+      return setErrors({
+        ...errors,
+        name: "Please enter name",
+      });
+    }
+
+    if (!phone) {
+      return setErrors({
+        ...errors,
+        phone: "Please enter phone",
+      });
+    }
+
+    if (!dob) {
+      return setErrors({
+        ...errors,
+        dob: "Please select dob",
+      });
+    }
+
     const newUserData = {
       name,
       phone,
       dob,
+      dor,
     };
     console.log(newUserData);
     await updateUser(id, newUserData);
+    setOpenEdit(false);
   };
 
   const columns: ColumnDef<User>[] = [
@@ -146,7 +191,7 @@ const AdminEmployeeList = () => {
       header: "Last Updated",
       accessorKey: "updatedAt",
       cell: ({ row }) => {
-        return format(row.original.updatedAt, "dd-MM-yyyy");
+        return format(row.original.updatedAt, "dd-MM-yyyy hh:mm a");
       },
     },
     {
@@ -158,139 +203,28 @@ const AdminEmployeeList = () => {
               row.original.dor ? "hidden" : "flex"
             }`}
           >
-            <Dialog>
-              <DialogTrigger asChild>
-                <Icon
-                  icon="mage:edit"
-                  fontSize={30}
-                  className=" cursor-pointer"
-                  onClick={() => {
-                    setName(row.original.name);
-                    setPhone(row.original.phone);
-                    setDob(row.original.dob ? row.original.dob : "");
-                  }}
-                />
-              </DialogTrigger>
+            <Icon
+              icon="mage:edit"
+              fontSize={30}
+              className=" cursor-pointer"
+              onClick={() => {
+                setOpenEdit(true);
+                setName(row.original.name);
+                setPhone(row.original.phone);
+                setDob(row.original.dob ? row.original.dob : "");
+                setSelectedUser(row.original);
+              }}
+            />
 
-              <DialogContent className="bg-white text-black max-sm:w-11/12">
-                <DialogHeader>
-                  <DialogTitle>Update Employee</DialogTitle>
-                  <DialogDescription className="hidden">
-                    Edit Form
-                  </DialogDescription>
-                </DialogHeader>
-
-                <form
-                  onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
-                    e.preventDefault();
-                    handleSubmit(row.original.id);
-                  }}
-                >
-                  <div>
-                    <Label>Name</Label>
-                    <Input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <Label>Email</Label>
-                    <Input
-                      type="email"
-                      readOnly
-                      disabled
-                      defaultValue={row.original.email}
-                    />
-                  </div>
-
-                  <div>
-                    <Label>Phone</Label>
-                    <Input
-                      type="tel"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                    />
-                  </div>
-
-                  {!row.original.dob && (
-                    <div>
-                      <Label>DOB</Label>
-                      <Input
-                        type="date"
-                        value={dob}
-                        onChange={(e) => setDob(e.target.value)}
-                      />
-                    </div>
-                  )}
-
-                  {row.original.dob && (
-                    <div>
-                      <Label>DOB</Label>
-                      <Input
-                        type="date "
-                        defaultValue={
-                          row.original.dob
-                            ? format(row.original.dob, "dd-MM-yyyy")
-                            : ""
-                        }
-                        readOnly
-                        disabled
-                      />
-                    </div>
-                  )}
-
-                  <DialogFooter className="pt-3">
-                    <Button
-                      type="submit"
-                      className="bg-[#6343d8] hover:bg-[#593cc1]"
-                    >
-                      Update
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
-
-            <Dialog>
-              <DialogTrigger asChild>
-                <Icon
-                  icon="ic:baseline-delete-forever"
-                  fontSize={30}
-                  className="cursor-pointer"
-                />
-              </DialogTrigger>
-              <DialogContent className="bg-white text-black max-sm:w-11/12 shadow shadow-[#754ffe] border border-[#007bff]">
-                <DialogHeader>
-                  <DialogTitle>
-                    Do you want delete {row.original.name}?
-                  </DialogTitle>
-                  <DialogDescription>Click yes to delete</DialogDescription>
-                </DialogHeader>
-                <div className="flex gap-5">
-                  <DialogClose asChild>
-                    <Button
-                      className="bg-[#754ffe] hover:bg-[#6f42c1]"
-                      onClick={() => {
-                        startLoading();
-                        delUser(row.original.id);
-                        stopLoading();
-                      }}
-                      disabled={loading}
-                    >
-                      {loading && (
-                        <span className="size-5 border-4 border-gray-500 border-t-white animate-spin me-2 rounded-full"></span>
-                      )}
-                      Yes
-                    </Button>
-                  </DialogClose>
-                  <DialogClose asChild>
-                    <Button className="bg-red-700">Cancel</Button>
-                  </DialogClose>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <Icon
+              icon="ic:baseline-delete-forever"
+              fontSize={30}
+              className="cursor-pointer"
+              onClick={() => {
+                setOpenDel(true);
+                setSelectedUser(row.original);
+              }}
+            />
           </div>
         );
       },
@@ -351,6 +285,173 @@ const AdminEmployeeList = () => {
           hideSearch={false}
         />
       </Card>
+
+      {/* Employee Update Mode; */}
+      <Dialog
+        open={openEdit}
+        onOpenChange={() => {
+          setOpenEdit(false);
+        }}
+      >
+        <DialogContent className="bg-white text-black max-sm:w-11/12">
+          <DialogHeader>
+            <DialogTitle>Update Employee</DialogTitle>
+            <DialogDescription className="hidden">Edit Form</DialogDescription>
+          </DialogHeader>
+
+          <form
+            onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+              e.preventDefault();
+              handleSubmit(selectedUser ? selectedUser.id : "");
+            }}
+          >
+            <div>
+              <Label>Name</Label>
+              <Input
+                type="text"
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  setErrors({ ...errors, name: "" });
+                }}
+              />
+
+              {errors.name && (
+                <p className="text-red-500 text-sm">{errors.name}</p>
+              )}
+            </div>
+
+            <div>
+              <Label>Email</Label>
+              <Input
+                type="email"
+                readOnly
+                disabled
+                defaultValue={selectedUser?.email}
+              />
+            </div>
+
+            <div>
+              <Label>Phone</Label>
+              <Input
+                type="tel"
+                value={phone}
+                onChange={(e) => {
+                  setPhone(e.target.value);
+                  setErrors({ ...errors, phone: "" });
+                }}
+              />
+              {errors.phone && (
+                <p className="text-red-500 text-sm">{errors.phone}</p>
+              )}
+            </div>
+
+            {!selectedUser?.dob && (
+              <div>
+                <Label>DOB</Label>
+                <Input
+                  type="date"
+                  value={dob}
+                  onChange={(e) => {
+                    setDob(e.target.value);
+                    setErrors({ ...errors, name: "" });
+                  }}
+                />
+                {errors.dob && (
+                  <p className="text-red-500 text-sm">{errors.dob}</p>
+                )}
+              </div>
+            )}
+
+            {selectedUser?.dob && (
+              <div>
+                <Label>DOB</Label>
+                <Input
+                  type="date "
+                  defaultValue={
+                    selectedUser.dob
+                      ? format(selectedUser.dob, "dd-MM-yyyy")
+                      : ""
+                  }
+                  readOnly
+                  disabled
+                />
+              </div>
+            )}
+
+            {!selectedUser?.dor && (
+              <div>
+                <Label>DOR</Label>
+                <Input
+                  type="date"
+                  value={dor}
+                  onChange={(e) => setDor(e.target.value)}
+                />
+              </div>
+            )}
+
+            {selectedUser?.dor && (
+              <div>
+                <Label>DOR</Label>
+                <Input
+                  type="date "
+                  defaultValue={
+                    selectedUser.dor
+                      ? format(selectedUser.dor, "dd-MM-yyyy")
+                      : ""
+                  }
+                  readOnly
+                  disabled
+                />
+              </div>
+            )}
+
+            <DialogFooter className="pt-3">
+              <Button type="submit" className="bg-[#6343d8] hover:bg-[#593cc1]">
+                Update
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Employee Delete Model */}
+      <Dialog
+        open={openDel}
+        onOpenChange={() => {
+          setOpenDel(false);
+        }}
+      >
+        <DialogContent className="bg-white text-black max-sm:w-11/12 shadow shadow-[#754ffe] border border-[#007bff]">
+          <DialogHeader>
+            <DialogTitle>Do you want delete {selectedUser?.name}?</DialogTitle>
+            <DialogDescription>Click yes to delete</DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-5">
+            <DialogClose asChild>
+              <Button
+                className="bg-[#754ffe] hover:bg-[#6f42c1]"
+                onClick={() => {
+                  startLoading();
+                  delUser(selectedUser ? selectedUser.id : "");
+                  stopLoading();
+                }}
+                disabled={loading}
+              >
+                {loading && (
+                  <span className="size-5 border-4 border-gray-500 border-t-white animate-spin me-2 rounded-full"></span>
+                )}
+                Yes
+              </Button>
+            </DialogClose>
+            <DialogClose asChild>
+              <Button className="bg-red-700" onClick={() => setOpenDel(false)}>
+                Cancel
+              </Button>
+            </DialogClose>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };

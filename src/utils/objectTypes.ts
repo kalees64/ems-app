@@ -144,6 +144,7 @@ export interface LeaveMail {
   assignedTo: null | User;
   user: string;
   leaveType: string;
+  cancelledDate?: string;
 }
 
 // Holiday object

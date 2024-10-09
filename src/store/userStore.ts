@@ -1,10 +1,9 @@
 import { UpdateUser, User } from "@/utils/objectTypes";
 
-import axios from "axios";
-
 import { toast } from "sonner";
 
 import { create } from "zustand";
+import axiosAPI from "./axiosAPI";
 
 interface UserStore {
   users: User[];
@@ -21,7 +20,7 @@ export const useUserStore = create<UserStore>((set) => ({
 
   fetchUsers: async () => {
     try {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users`);
+      const res = await axiosAPI.get(`/users`);
       set({ users: res.data.data });
     } catch (error) {
       console.log(error);
@@ -30,7 +29,8 @@ export const useUserStore = create<UserStore>((set) => ({
 
   getAllUsers: async () => {
     try {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users`);
+      const token = getToken();
+      const res = await axiosAPI.get(`/users`);
       set({ users: res.data.data });
       return res.data.data;
     } catch (error) {
@@ -40,9 +40,7 @@ export const useUserStore = create<UserStore>((set) => ({
 
   getUser: async (id) => {
     try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/id/${id}`
-      );
+      const res = await axiosAPI.get(`/users/id/${id}`);
       const user = res.data.data;
       return user;
     } catch (error) {
@@ -53,10 +51,7 @@ export const useUserStore = create<UserStore>((set) => ({
 
   createUser: async (data) => {
     try {
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/users`,
-        data
-      );
+      const res = await axiosAPI.post(`/users`, data);
       set((state) => ({ users: [...state.users, res.data.data] }));
       return res.data.data;
     } catch (error) {
@@ -70,10 +65,8 @@ export const useUserStore = create<UserStore>((set) => ({
 
   updateUser: async (id, data) => {
     try {
-      const res = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/id/${id}`,
-        data
-      );
+      const token = getToken();
+      const res = await axiosAPI.put(`/users/id/${id}`, data);
       const user = res.data.data;
       set((state) => ({
         users: state.users.map((val) => (val.id === id ? user : val)),
@@ -91,9 +84,8 @@ export const useUserStore = create<UserStore>((set) => ({
 
   deleteUser: async (id) => {
     try {
-      const res = await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/id/${id}`
-      );
+      const token = getToken();
+      const res = await axiosAPI.delete(`/users/id/${id}`);
       set((state) => ({
         users: state.users.filter((val) => val.id !== res.data.data.id),
       }));
@@ -108,3 +100,13 @@ export const useUserStore = create<UserStore>((set) => ({
     }
   },
 }));
+
+export const getToken = async () => {
+  const res = await localStorage.getItem("token");
+  if (res) {
+    const data = await JSON.parse(res);
+    const token = data.token;
+    console.log(typeof token);
+    return token;
+  }
+};
