@@ -243,7 +243,7 @@ const AdminEmployeeList = () => {
           href="/admin/add"
           className="bg-[#6343d8] hover:bg-[#593cc1] p-2 rounded text-white flex gap-2 items-center cursor-pointer"
         >
-          <Icon icon="gg:add-r" fontSize={25} />
+          <Icon icon="zondicons:add-outline" fontSize={20} />
           <p>Add Employee</p>
         </Link>
       </div>

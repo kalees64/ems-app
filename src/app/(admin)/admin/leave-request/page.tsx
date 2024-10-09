@@ -428,7 +428,7 @@ const AdminLeaveApplyForm = () => {
 
               <Input
                 type="checkbox"
-                className="size-14"
+                className="size-3"
                 checked={halfDay}
                 onChange={(e) => {
                   setHalfDay(e.target.checked);
