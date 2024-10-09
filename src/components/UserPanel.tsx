@@ -205,7 +205,7 @@ const UserPanel = ({ id }: { id: string }) => {
           </div>
 
           <div className="bg-white shadow-md rounded-lg p-6">
-            <h3 className="text-xl font-bold mb-1">Holiday Calender</h3>
+            <h3 className="text-xl font-bold mb-1">Holiday Calendar</h3>
             <div className="flex items-center pb-2 justify-center">
               <span className=" size-3 rounded-full p-0.5 bg-green-500"></span>
               <span className="mx-2">Holiday</span>

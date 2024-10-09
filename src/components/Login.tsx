@@ -43,6 +43,9 @@ const Login = () => {
     startLoading();
     try {
       const user = await login(data);
+      if (!user) {
+        throw new Error("Invalid Login Credentials");
+      }
       const roles = user.roles.map((val) => val.key);
       form.reset();
       if (roles.includes("ADMIN")) {
@@ -51,7 +54,7 @@ const Login = () => {
         }, 100);
         stopLoading();
         return router.push(`/admin`);
-      } else if (roles.includes("Employee")) {
+      } else if (roles.includes("EMPLOYEE")) {
         setTimeout(() => {
           toast.success(`Welcome ${user.name}`);
         }, 100);
@@ -75,6 +78,8 @@ const Login = () => {
   return (
     <div className="w-full h-screen flex items-center justify-center  bg-[#f1f5f9] ">
       <div className="w-96 mx-auto p-4 border max-sm:w-72 rounded-lg shadow bg-white/60 dark:bg-white text-black">
+        <h1 className="text-3xl font-bold text-center">HRMS Application</h1>
+
         <h2 className="text-2xl font-bold mb-6 text-center text-black">
           Login
         </h2>

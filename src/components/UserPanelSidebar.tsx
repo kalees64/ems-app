@@ -20,7 +20,7 @@ const UserPanelSidebar = ({
   return (
     <div className="h-full w-full bg-[#1e293b] text-white flex flex-col space-y-4 p-4 ">
       <h1 className="text-xl font-bold max-lg:hidden w-full pt-2 ps-3 cursor-pointer">
-        Employee Panel
+        Employee Portal
       </h1>
 
       <nav className="flex flex-col space-y-4 pt-2 max-lg:pt-0 max-lg:pb-4 font-semibold">

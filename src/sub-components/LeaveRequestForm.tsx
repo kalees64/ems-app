@@ -377,7 +377,7 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
           )}
         </div>
 
-        {totalDays > 0 ? (
+        {totalDays >= 0 ? (
           <div>
             <Label>
               Total Days<span className="text-red-500">&nbsp;*</span>
@@ -468,7 +468,7 @@ const LeaveRequestForm = ({ id }: { id: string }) => {
             Assigned To<span className="text-red-500">&nbsp;*</span>
           </Label>
 
-          <Input readOnly value="jk1@assarcr.com" disabled />
+          <Input readOnly value="jk1@assaycr.com" disabled />
         </div>
 
         <div className="pt-3">

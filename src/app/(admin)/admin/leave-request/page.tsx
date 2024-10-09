@@ -248,7 +248,7 @@ const AdminLeaveApplyForm = () => {
 
         <div>
           <Label>
-            Employee ID<span className="text-red-500">&nbsp;*</span>
+            Employee Name<span className="text-red-500">&nbsp;*</span>
           </Label>
 
           <Select
@@ -266,7 +266,7 @@ const AdminLeaveApplyForm = () => {
             }}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Employee ID" />
+              <SelectValue placeholder="Employee Name" />
             </SelectTrigger>
 
             <SelectContent>
@@ -502,7 +502,7 @@ const AdminLeaveApplyForm = () => {
             Assigned To<span className="text-red-500">&nbsp;*</span>
           </Label>
 
-          <Input readOnly value="jk1@assarcr.com" disabled />
+          <Input readOnly value="jk1@assaycr.com" disabled />
         </div>
 
         <div className="pt-3">

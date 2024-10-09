@@ -99,10 +99,12 @@ const AdminLeaveRequestConfirmation = () => {
               {data ? format(data.endDate, "dd-MM-yyyy") : ""}
             </TableCell>
           </TableRow>
-          <TableRow>
-            <TableHead className="text-black">Half Day</TableHead>
-            <TableCell>{data?.halfDay ? "Yes" : "No"}</TableCell>
-          </TableRow>
+          {data?.halfDay && (
+            <TableRow>
+              <TableHead className="text-black">Half Day</TableHead>
+              <TableCell>{data?.halfDay ? "Yes" : "No"}</TableCell>
+            </TableRow>
+          )}
           {data?.halfDay && (
             <TableRow>
               <TableHead className="text-black">Half Day Session</TableHead>

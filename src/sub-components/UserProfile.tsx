@@ -58,14 +58,38 @@ const UserProfile = ({ userData }: { userData: User }) => {
           htmlFor="phone"
           className="block text-sm font-medium text-gray-700 mb-2"
         >
-          DOB
+          Date of Joining
+        </label>
+        <h1 className="w-full font-bold">
+          {user.doj ? format(user.doj, "dd-MM-yyy") : "Not Updated"}
+        </h1>
+      </div>
+      <div className="mb-4">
+        <label
+          htmlFor="phone"
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
+          Date of Birth
         </label>
         <h1 className="w-full font-bold">
           {user.dob ? format(user.dob, "dd-MM-yyy") : "Not Updated"}
         </h1>
       </div>
+      <div className="mb-4">
+        <label
+          htmlFor="phone"
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
+          Date of Resignation
+        </label>
+        <h1 className="w-full font-bold">
+          {user.dor ? format(user.dor, "dd-MM-yyy") : "Not Updated"}
+        </h1>
+      </div>
 
-      <UserUpdateForm user={user} setUser={setUser} admin={false} />
+      {!user.dor && (
+        <UserUpdateForm user={user} setUser={setUser} admin={false} />
+      )}
     </div>
   );
 };

@@ -15,15 +15,21 @@ const AdminPage = () => {
     if (token) {
       const userID = await getUserIDfromToken();
       const user = await getUser(userID);
+      const roles = user.roles.map((val) => val.key);
 
-      if (user) {
+      if (roles.includes("ADMIN")) {
+        return router.push("/admin/employees");
+      } else if (roles.includes("EMPLOYEE")) {
         setTimeout(() => {
           toast.error("Please login to access the portal");
         }, 100);
         return router.push("/login");
+      } else {
+        setTimeout(() => {
+          toast.error("Insufficient Privileges");
+        }, 100);
+        return router.push("/login");
       }
-
-      return router.push("/admin/employees");
     }
     setTimeout(() => {
       toast.error("Please login to access the portal");

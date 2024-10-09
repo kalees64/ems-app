@@ -151,7 +151,7 @@ const AdminEmployeeList = () => {
             className="flex items-center cursor-pointer gap-1"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            DOJ
+            Date of Joining
             <LuArrowDownUp className=" h-3 w-3 " />
           </span>
         );
@@ -166,13 +166,24 @@ const AdminEmployeeList = () => {
       },
     },
     {
+      header: "Date of Birth",
+      accessorKey: "dob",
+      cell: ({ row }) => {
+        if (row.original.dob) {
+          return format(row.original.dob, "dd-MM-yyyy");
+        } else {
+          return "-";
+        }
+      },
+    },
+    {
       header: ({ column }) => {
         return (
           <span
             className="flex items-center cursor-pointer gap-1"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            DOR
+            Resigned Date
             <LuArrowDownUp className=" h-3 w-3 " />
           </span>
         );
@@ -197,11 +208,7 @@ const AdminEmployeeList = () => {
       header: "Action",
       cell: ({ row }) => {
         return (
-          <div
-            className={`flex items-center gap-3 justify-center ${
-              row.original.dor ? "hidden" : "flex"
-            }`}
-          >
+          <div className={`flex items-center gap-3 justify-center `}>
             <Icon
               icon="mage:edit"
               fontSize={30}
@@ -211,6 +218,7 @@ const AdminEmployeeList = () => {
                 setName(row.original.name);
                 setPhone(row.original.phone);
                 setDob(row.original.dob ? row.original.dob : "");
+                setDor(row.original.dor ? row.original.dor : "");
                 setSelectedUser(row.original);
               }}
             />
@@ -273,7 +281,7 @@ const AdminEmployeeList = () => {
       <Card className="w-full mt-5 pt-2 max-sm:px-1  relative  shadow ">
         <div className="w-full flex justify-between items-center pt-2 pb-4">
           <h2 className="text-lg font-semibold ps-3 ">
-            Employees List ({users ? users.length : 0}){" "}
+            Employees ({users ? users.length : 0}){" "}
           </h2>
         </div>
         <CustomTable
@@ -322,12 +330,7 @@ const AdminEmployeeList = () => {
 
             <div>
               <Label>Email</Label>
-              <Input
-                type="email"
-                readOnly
-                disabled
-                defaultValue={selectedUser?.email}
-              />
+              <Input type="email" readOnly defaultValue={selectedUser?.email} />
             </div>
 
             <div>
@@ -364,7 +367,7 @@ const AdminEmployeeList = () => {
 
             {selectedUser?.dob && (
               <div>
-                <Label>DOB</Label>
+                <Label>Date of Birth</Label>
                 <Input
                   type="date "
                   defaultValue={
@@ -373,23 +376,20 @@ const AdminEmployeeList = () => {
                       : ""
                   }
                   readOnly
-                  disabled
                 />
               </div>
             )}
 
-            {!selectedUser?.dor && (
-              <div>
-                <Label>DOR</Label>
-                <Input
-                  type="date"
-                  value={dor}
-                  onChange={(e) => setDor(e.target.value)}
-                />
-              </div>
-            )}
+            {/* <div>
+              <Label>DOR</Label>
+              <Input
+                type="date"
+                value={dor}
+                onChange={(e) => setDor(e.target.value)}
+              />
+            </div> */}
 
-            {selectedUser?.dor && (
+            {/* {selectedUser?.dor && (
               <div>
                 <Label>DOR</Label>
                 <Input
@@ -403,7 +403,7 @@ const AdminEmployeeList = () => {
                   disabled
                 />
               </div>
-            )}
+            )} */}
 
             <DialogFooter className="pt-3">
               <Button type="submit" className="bg-[#6343d8] hover:bg-[#593cc1]">
