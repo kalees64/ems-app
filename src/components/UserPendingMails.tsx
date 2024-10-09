@@ -4,13 +4,7 @@ import React, { useEffect, useState } from "react";
 
 import { Card } from "./ui/card";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTrigger,
-} from "./ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader } from "./ui/dialog";
 
 import { useLeaveApplyStore } from "@/store/leaveApplyStore";
 

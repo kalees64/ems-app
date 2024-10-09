@@ -73,7 +73,7 @@ const AdminLeaveApplyForm = () => {
 
   const [reason, setReason] = useState<string>();
 
-  const [leaveBalances, setLeaveBalances] = useState<LeaveBalance[]>();
+  const [leaveBalances] = useState<LeaveBalance[]>();
 
   const [remainingDays, setRemainingDays] = useState<number>(0);
 

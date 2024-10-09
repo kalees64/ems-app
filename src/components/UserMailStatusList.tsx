@@ -1,26 +1,16 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 import { Card } from "./ui/card";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTrigger,
-} from "./ui/dialog";
 
 import { useLeaveApplyStore } from "@/store/leaveApplyStore";
 
 import { LeaveMail } from "@/utils/objectTypes";
 
-import { format, isBefore } from "date-fns";
+import { format } from "date-fns";
 
 import { useLeavesStore } from "@/store/leaveStore";
-
-import { Button } from "./ui/button";
 
 import { ColumnDef } from "@tanstack/react-table";
 
@@ -28,44 +18,12 @@ import { CustomTable } from "@/sub-components/CustomTable";
 
 import { LuArrowDownUp } from "react-icons/lu";
 
-import { TbMailCancel } from "react-icons/tb";
-
-import { Label } from "./ui/label";
-
-import { useUserStore } from "@/store/userStore";
-
-import { Input } from "./ui/input";
-
 const UserMailStatusList = ({ id }: { id: string }) => {
   const { mails, fetchMails } = useLeaveApplyStore();
 
   const { leaves, fetchLeaves } = useLeavesStore();
 
-  const { users, fetchUsers } = useUserStore();
-
   const userMails = mails.filter((mail) => mail.user === id);
-
-  const [reason, setReason] = useState<string>("");
-
-  const [error, setError] = useState<string>("");
-
-  const { rejectLeave } = useLeaveApplyStore();
-
-  const handleCancel = async (id: string) => {
-    if (!reason) {
-      return setError("Please enter the reason");
-    }
-    const today = new Date().toISOString();
-    try {
-      await rejectLeave(id, {
-        comments: reason,
-        status: "CANCELLED",
-        approvedDate: today,
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const colums: ColumnDef<LeaveMail>[] = [
     {
@@ -165,7 +123,6 @@ const UserMailStatusList = ({ id }: { id: string }) => {
   useEffect(() => {
     fetchMails();
     fetchLeaves();
-    fetchUsers();
   }, []);
 
   if (!mails) {

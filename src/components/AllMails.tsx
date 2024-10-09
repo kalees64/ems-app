@@ -10,12 +10,11 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTrigger,
 } from "./ui/dialog";
 
 import { useLeaveApplyStore } from "@/store/leaveApplyStore";
 
-import { Leave, LeaveMail, User } from "@/utils/objectTypes";
+import { LeaveMail, User } from "@/utils/objectTypes";
 
 import { useUserStore } from "@/store/userStore";
 
@@ -110,8 +109,6 @@ const AllMails = () => {
   const [selectedMail, setSelectedMail] = useState<LeaveMail>();
 
   const [selectedUser, setSelectedUser] = useState<User>();
-
-  const [selectedLeaveType, setSelectedLeaveType] = useState<Leave>();
 
   const columns: ColumnDef<LeaveMail>[] = [
     {
@@ -218,9 +215,7 @@ const AllMails = () => {
       header: "Action",
       cell: ({ row }) => {
         const user = users.find((val) => val.id === row.original.user);
-        const leaveType = leaves.find(
-          (val) => val.id === row.original.leaveType
-        );
+
         return (
           <div className="flex justify-center items-center gap-4">
             <Icon
@@ -231,7 +226,6 @@ const AllMails = () => {
                 setOpenApprove(true);
                 setSelectedMail(row.original);
                 setSelectedUser(user);
-                setSelectedLeaveType(leaveType);
               }}
             />
 
@@ -243,7 +237,6 @@ const AllMails = () => {
                 setOpenCancel(true);
                 setSelectedMail(row.original);
                 setSelectedUser(user);
-                setSelectedLeaveType(leaveType);
               }}
             />
           </div>

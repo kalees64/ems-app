@@ -11,15 +11,6 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "./ui/table";
-
 import { Icon } from "@iconify/react/dist/iconify.js";
 
 import { Label } from "./ui/label";
@@ -37,8 +28,11 @@ import { Toaster } from "sonner";
 import { format } from "date-fns";
 
 import { useLoadStore } from "@/store/authStore";
+
 import { ColumnDef } from "@tanstack/react-table";
+
 import { LuArrowDownUp } from "react-icons/lu";
+
 import { CustomTable } from "@/sub-components/CustomTable";
 
 const HolidaysList = () => {

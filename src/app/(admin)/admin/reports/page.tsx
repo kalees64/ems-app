@@ -1,4 +1,5 @@
 import Reports from "@/components/Reports";
+
 import React from "react";
 
 const ReportPage = () => {

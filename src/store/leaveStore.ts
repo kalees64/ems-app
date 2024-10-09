@@ -3,7 +3,7 @@ import { Leave, UpdateLeave } from "@/utils/objectTypes";
 import { toast } from "sonner";
 
 import { create } from "zustand";
-import { getToken } from "./userStore";
+
 import axiosAPI from "./axiosAPI";
 
 interface LeaveStore {

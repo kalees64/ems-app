@@ -44,7 +44,6 @@ const Login = () => {
     try {
       const user = await login(data);
       const roles = user.roles.map((val) => val.key);
-      const userRole: string = user.roles[0].key;
       form.reset();
       if (roles.includes("ADMIN")) {
         setTimeout(() => {

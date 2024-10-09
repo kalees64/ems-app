@@ -3,6 +3,7 @@ import { LeaveData, LeaveDataCopy, LeaveMail } from "@/utils/objectTypes";
 import { toast } from "sonner";
 
 import { create } from "zustand";
+
 import axiosAPI from "./axiosAPI";
 
 interface LeaveApplyStore {

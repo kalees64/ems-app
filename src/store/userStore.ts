@@ -3,6 +3,7 @@ import { UpdateUser, User } from "@/utils/objectTypes";
 import { toast } from "sonner";
 
 import { create } from "zustand";
+
 import axiosAPI from "./axiosAPI";
 
 interface UserStore {
@@ -29,7 +30,6 @@ export const useUserStore = create<UserStore>((set) => ({
 
   getAllUsers: async () => {
     try {
-      const token = getToken();
       const res = await axiosAPI.get(`/users`);
       set({ users: res.data.data });
       return res.data.data;
@@ -65,7 +65,6 @@ export const useUserStore = create<UserStore>((set) => ({
 
   updateUser: async (id, data) => {
     try {
-      const token = getToken();
       const res = await axiosAPI.put(`/users/id/${id}`, data);
       const user = res.data.data;
       set((state) => ({
@@ -84,7 +83,6 @@ export const useUserStore = create<UserStore>((set) => ({
 
   deleteUser: async (id) => {
     try {
-      const token = getToken();
       const res = await axiosAPI.delete(`/users/id/${id}`);
       set((state) => ({
         users: state.users.filter((val) => val.id !== res.data.data.id),

@@ -1,6 +1,7 @@
 import { LeaveBalance, UptLeaveBalance } from "@/utils/objectTypes";
 
 import { create } from "zustand";
+
 import axiosAPI from "./axiosAPI";
 
 interface LeaveBalanceStore {
